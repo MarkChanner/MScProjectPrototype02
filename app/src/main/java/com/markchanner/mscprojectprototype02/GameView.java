@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * @author Mark Channer for second prototype of Birkbeck MSc Computer Science final project
+ * !!!!!!!!!!! Instead of messing around with tiles, check out setting tags on Images/Bitmaps !!!!!!!!!!!!!!!!!!!!
+ *
+ * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public class GameView extends View {
 
@@ -34,6 +36,7 @@ public class GameView extends View {
 
     int scaledEmoticonSize;
     private List<Emoticon> emoticonList = new ArrayList<>(); // May yet stick with a 2d array
+    private Tile[][] tiles = new Tile[8][7]; // could use this (if so, use constants for rows and cols,etc)
 
 
     /**
@@ -76,11 +79,20 @@ public class GameView extends View {
         upsetBitmap = Bitmap.createScaledBitmap(temp, scaledEmoticonSize, scaledEmoticonSize, false);
 
         // Populates list with emoticon objects with randomly set bitmaps for emotion
-        Emoticon tempEmoticon;
+        Emoticon newEmoticon;
         for (int rowID = 0; rowID < 8; rowID++) {
             for (int columnID = 0; columnID < 7; columnID++) {
-                tempEmoticon = generateRandomEmoticon(rowID, columnID);
-                emoticonList.add(tempEmoticon);
+
+                do {
+                    newEmoticon = generateRandomEmoticon(rowID, columnID);
+                } while ((rowID >= 2 &&
+                        (newEmoticon.getType().equals(tiles[rowID - 1][columnID].getBitmapType()) &&
+                                newEmoticon.getType().equals(tiles[rowID - 2][columnID].getBitmapType()))) ||
+                        (columnID >= 2 &&
+                                (newEmoticon.getType().equals(tiles[rowID][columnID - 1].getBitmapType()) &&
+                                        newEmoticon.getType().equals(tiles[rowID][columnID - 2].getBitmapType()))));
+                emoticonList.add(newEmoticon);
+                tiles[rowID][columnID].setBitmapType("AN"); /** Tiles may be avoided if I can set a tag with the image/bitmap !!!!! */
             }
         }
     }
@@ -90,6 +102,8 @@ public class GameView extends View {
         Emoticon emoticon = null;
         Random random = new Random();
         int value = random.nextInt(5);
+
+
         switch (value) {
             case 0:
                 emoticon = new Emoticon(angryBitmap, rowID, columnID);

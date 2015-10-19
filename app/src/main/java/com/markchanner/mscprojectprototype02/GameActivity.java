@@ -6,7 +6,8 @@ import android.view.Window;
 import android.view.WindowManager;
 
 /**
- * @author Mark Channer for second prototype of Birkbeck MSc Computer Science final project
+ *
+ * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public class GameActivity extends Activity {
 
