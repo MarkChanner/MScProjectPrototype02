@@ -9,54 +9,49 @@ import android.graphics.Paint;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 /**
- * !!!!!!!!!!! Instead of messing around with tiles, check out setting tags on Images/Bitmaps !!!!!!!!!!!!!!!!!!!!
- *
  * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public class GameView extends View {
 
     private Context context;
-    private Paint canvasColour;
-    private Paint rectangleOutlineColour;
-    private Paint rectangleInnerColour;
-
+    private Paint backgroundColour;
+    private Paint gridLineColour;
     private int screenWidth;
     private int screenHeight;
-
     private Bitmap angryBitmap;
     private Bitmap delightedBitmap;
     private Bitmap embarrassedBitmap;
     private Bitmap surprisedBitmap;
     private Bitmap upsetBitmap;
+    private int emoticonWidth;
+    private int emoticonHeight;
+    private final int ROW = 8;
+    private final int COL = 7;
+    private Emoticon[][] emoticonArray = new Emoticon[ROW][COL];
+    private static final int ZERO = 0;
+    private static final int ONE = 1;
+    private int[] userSelection01 = new int[2];
+    private int[] userSelection02 = new int[2];
+    private boolean firstSelectionMade;
 
-    int scaledEmoticonSize;
-    private List<Emoticon> emoticonList = new ArrayList<>(); // May yet stick with a 2d array
-    private Tile[][] tiles = new Tile[8][7]; // could use this (if so, use constants for rows and cols,etc)
-
-
-    /**
-     * Don't use width and height of a View inside constructor!
-     */
     public GameView(Context context) {
         super(context);
         this.context = context;
         context.getResources();
-        canvasColour = new Paint();
-        rectangleOutlineColour = new Paint();
-        rectangleInnerColour = new Paint();
+        backgroundColour = new Paint();
+        gridLineColour = new Paint();
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
+    protected void onSizeChanged(int w, int h, int oldW, int oldH) {
+        super.onSizeChanged(w, h, oldW, oldH);
         screenWidth = w;
         screenHeight = h;
-        scaledEmoticonSize = (screenWidth / 14);
+        emoticonWidth = screenWidth / 8;
+        emoticonHeight = screenHeight / 7;
         createEmoticons();
     }
 
@@ -64,35 +59,34 @@ public class GameView extends View {
         Bitmap temp;
         // Retrieves graphics from drawable, scales down, then assigns to Bitmap object
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.angry);
-        angryBitmap = Bitmap.createScaledBitmap(temp, scaledEmoticonSize, scaledEmoticonSize, false);
+        angryBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.delighted);
-        delightedBitmap = Bitmap.createScaledBitmap(temp, scaledEmoticonSize, scaledEmoticonSize, false);
+        delightedBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.embarrassed);
-        embarrassedBitmap = Bitmap.createScaledBitmap(temp, scaledEmoticonSize, scaledEmoticonSize, false);
+        embarrassedBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.surprised);
-        surprisedBitmap = Bitmap.createScaledBitmap(temp, scaledEmoticonSize, scaledEmoticonSize, false);
+        surprisedBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.upset);
-        upsetBitmap = Bitmap.createScaledBitmap(temp, scaledEmoticonSize, scaledEmoticonSize, false);
+        upsetBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
 
-        // Populates list with emoticon objects with randomly set bitmaps for emotion
+        // Populates array with emoticon objects with randomly set bitmaps for emotion
         Emoticon newEmoticon;
         for (int rowID = 0; rowID < 8; rowID++) {
             for (int columnID = 0; columnID < 7; columnID++) {
+                newEmoticon = generateRandomEmoticon(rowID, columnID); //this should be in do/while loop that eliminates more than 2 in a row
+                /*do {
 
-                do {
-                    newEmoticon = generateRandomEmoticon(rowID, columnID);
                 } while ((rowID >= 2 &&
-                        (newEmoticon.getType().equals(tiles[rowID - 1][columnID].getBitmapType()) &&
-                                newEmoticon.getType().equals(tiles[rowID - 2][columnID].getBitmapType()))) ||
+                        (newEmoticon.getType().equals(emoticonArray[rowID - 1][columnID].getBitmapType()) &&
+                                newEmoticon.getType().equals(emoticonArray[rowID - 2][columnID].getBitmapType()))) ||
                         (columnID >= 2 &&
-                                (newEmoticon.getType().equals(tiles[rowID][columnID - 1].getBitmapType()) &&
-                                        newEmoticon.getType().equals(tiles[rowID][columnID - 2].getBitmapType()))));
-                emoticonList.add(newEmoticon);
-                tiles[rowID][columnID].setBitmapType("AN"); /** Tiles may be avoided if I can set a tag with the image/bitmap !!!!! */
+                                (newEmoticon.getType().equals(emoticonArray[rowID][columnID - 1].getBitmapType()) &&
+                                        newEmoticon.getType().equals(emoticonArray[rowID][columnID - 2].getBitmapType()))));*/
+                emoticonArray[rowID][columnID] = newEmoticon;
             }
         }
     }
@@ -102,8 +96,6 @@ public class GameView extends View {
         Emoticon emoticon = null;
         Random random = new Random();
         int value = random.nextInt(5);
-
-
         switch (value) {
             case 0:
                 emoticon = new Emoticon(angryBitmap, rowID, columnID);
@@ -129,52 +121,63 @@ public class GameView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        // Sets canvasColour colour and draws it to the canvas
-        canvasColour.setColor(Color.YELLOW);
-        canvas.drawRect(0, 0, getWidth(), getHeight(), canvasColour);
+        // Draws a rectangle with sky blue centre
+        backgroundColour.setColor(Color.parseColor("#7EC0EE"));
+        canvas.drawRect(0, 0, getWidth(), getHeight(), backgroundColour);
 
-        // Draws a rectangle with green centre
-        rectangleOutlineColour.setStrokeWidth(2f);
-        rectangleOutlineColour.setColor(Color.BLACK);
-        rectangleOutlineColour.setStyle(Paint.Style.STROKE);
-        rectangleInnerColour.setColor(Color.GREEN);
-        canvas.drawRect(5 * scaledEmoticonSize, scaledEmoticonSize, 13 * scaledEmoticonSize, 8 * scaledEmoticonSize, rectangleInnerColour);
-
-        // Draws grid within rectangle
-        for (int i = 5; i < 14; i++) {
-            canvas.drawLine(i * scaledEmoticonSize, scaledEmoticonSize, i * scaledEmoticonSize, 8 * scaledEmoticonSize, rectangleOutlineColour);
-            for (int j = 1; j < 9; j++) {
-                canvas.drawLine(i * scaledEmoticonSize, j * scaledEmoticonSize, 8 * scaledEmoticonSize, j * scaledEmoticonSize, rectangleOutlineColour);
-            }
+        // Draws grid lines within rectangle
+        gridLineColour.setStrokeWidth(2f);
+        gridLineColour.setColor(Color.BLACK);
+        for (int i = 0; i < 8; i++) {
+            canvas.drawLine(0, i * emoticonHeight, getWidth(), i * emoticonHeight, gridLineColour);
+            canvas.drawLine(i * emoticonWidth, 0, i * emoticonWidth, getHeight(), gridLineColour);
         }
         // Draws emoticonList on canvas
-        Emoticon tempEmoticon;
-        int counter = 0;
-        for (int i = 5; i < 13; i++) {
-            for (int j = 1; j < 8; j++) {
-                Emoticon e = emoticonList.get(counter);
-                canvas.drawBitmap(e.getBitmap(), i * scaledEmoticonSize, j * scaledEmoticonSize, null);
-                counter++;
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 7; col++) {
+                Emoticon e = emoticonArray[row][col];
+                canvas.drawBitmap(e.getBitmap(), row * emoticonWidth, col * emoticonHeight, null);
             }
         }
-        invalidate();
     }
 
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int eventAction = event.getAction();
         int x = (int) event.getX();
         int y = (int) event.getY();
-        /*switch (eventAction) {
-            case MotionEvent.ACTION_UP:
-                if (x > screenWidth - emoticon.getWidth() - 30) &&
-                        y > screenHeight - scaledEmoticonSize &&
-                        y < screenHeight - scaledEmoticonSize) {
-
-                }
-            break;
-            invalidate();
-
-        }*/
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                selectTile(x / emoticonWidth, y / emoticonHeight);
+                break;
+        }
+        invalidate();
         return true;
+    }
+
+    public void selectTile(int row, int column) {
+        if (!(firstSelectionMade)) {
+            firstSelectionMade = true;
+            userSelection01[ZERO] = row;
+            userSelection01[ONE] = column;
+        } else {
+            userSelection02[ZERO] = row;
+            userSelection02[ONE] = column;
+            swapPieces();
+            resetUserSelections();
+        }
+    }
+
+    private void swapPieces() {
+        Emoticon tempEmoticon = emoticonArray[userSelection01[ZERO]][userSelection01[ONE]];
+        emoticonArray[userSelection01[ZERO]][userSelection01[ONE]] = emoticonArray[userSelection02[ZERO]][userSelection02[ONE]];
+        emoticonArray[userSelection02[ZERO]][userSelection02[ONE]] = tempEmoticon;
+    }
+
+    private void resetUserSelections() {
+        firstSelectionMade = false;
+        userSelection01[ZERO] = -1;
+        userSelection01[ONE] = -1;
+        userSelection02[ZERO] = -1;
+        userSelection02[ONE] = -1;
     }
 }
