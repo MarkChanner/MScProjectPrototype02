@@ -43,6 +43,7 @@ public class GameView extends View {
         context.getResources();
         backgroundColour = new Paint();
         gridLineColour = new Paint();
+        resetUserSelections();
     }
 
     @Override
@@ -77,15 +78,16 @@ public class GameView extends View {
         Emoticon newEmoticon;
         for (int rowID = 0; rowID < 8; rowID++) {
             for (int columnID = 0; columnID < 7; columnID++) {
-                newEmoticon = generateRandomEmoticon(rowID, columnID); //this should be in do/while loop that eliminates more than 2 in a row
-                /*do {
 
+                do {
+                    /** "the newEmoticon =" line below moved into do loop from above do loop */
+                    newEmoticon = generateRandomEmoticon(rowID, columnID);
                 } while ((rowID >= 2 &&
                         (newEmoticon.getType().equals(emoticonArray[rowID - 1][columnID].getBitmapType()) &&
                                 newEmoticon.getType().equals(emoticonArray[rowID - 2][columnID].getBitmapType()))) ||
                         (columnID >= 2 &&
                                 (newEmoticon.getType().equals(emoticonArray[rowID][columnID - 1].getBitmapType()) &&
-                                        newEmoticon.getType().equals(emoticonArray[rowID][columnID - 2].getBitmapType()))));*/
+                                        newEmoticon.getType().equals(emoticonArray[rowID][columnID - 2].getBitmapType()))));
                 emoticonArray[rowID][columnID] = newEmoticon;
             }
         }
@@ -160,11 +162,60 @@ public class GameView extends View {
             userSelection01[ZERO] = row;
             userSelection01[ONE] = column;
         } else {
-            userSelection02[ZERO] = row;
-            userSelection02[ONE] = column;
-            swapPieces();
+            if (!sameTileSelectedTwice()) {
+                userSelection02[ZERO] = row;
+                userSelection02[ONE] = column;
+                checkValidSelections();
+            }
+        }
+    }
+
+    private void checkValidSelections() {
+        if (!sameTileSelectedTwice()) {
+            if (selectedTilesAreAdjacent()) {
+                compareTileContents();
+            } else {
+                /*  Selections not adjacent. Last selection becomes first selection */
+                userSelection01[ZERO] = userSelection02[ZERO];
+                userSelection01[ONE] = userSelection02[ONE];
+                userSelection02[ZERO] = -1;
+                userSelection02[ONE] = -1;
+            }
+        } else {
+            /* Same selection made twice. Reset selections */
             resetUserSelections();
         }
+    }
+
+    private boolean sameTileSelectedTwice() {
+        return ((userSelection01[ZERO] == userSelection02[ZERO]) && (userSelection01[ONE] == userSelection02[ONE]));
+    }
+
+    private boolean selectedTilesAreAdjacent() {
+        if ((userSelection01[ZERO] == userSelection02[ZERO]) &&
+                (userSelection01[ONE] == (userSelection02[ONE] + 1) || userSelection01[ONE] == (userSelection02[ONE] - 1))) {
+            return true;
+        } else if ((userSelection01[ONE] == userSelection02[ONE]) &&
+                (userSelection01[ZERO] == (userSelection02[ZERO] + 1) || userSelection01[ZERO] == (userSelection02[ZERO] - 1))) {
+            return true;
+        }
+        return false;
+    }
+
+    private void compareTileContents() {
+        if (differentPieceTypes()) {
+            swapPieces();
+            //findMatches();
+        } else {
+            /* Both selections are of the same Tile. Reset selections */
+        }
+        resetUserSelections();
+    }
+
+    private boolean differentPieceTypes() {
+        /* Uses sameAs() method from graphics.Bitmap */
+        return (!(emoticonArray[userSelection01[ZERO]][userSelection01[ONE]].getBitmap()
+                .sameAs(emoticonArray[userSelection02[ZERO]][userSelection02[ONE]].getBitmap())));
     }
 
     private void swapPieces() {
