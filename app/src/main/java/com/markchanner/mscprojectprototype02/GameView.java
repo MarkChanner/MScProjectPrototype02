@@ -82,12 +82,13 @@ public class GameView extends View {
                 // type in a row keep randomly generating a different Bitmap
                 do {
                     newEmoticon = generateRandomEmoticon(rowID, columnID);
-                } while ((rowID >= 2 &&
-                        (newEmoticon.getBitmap().sameAs(emoticonArray[rowID - 1][columnID].getBitmap()) &&
-                                newEmoticon.getBitmap().sameAs(emoticonArray[rowID - 2][columnID].getBitmap()))) ||
+                } while ((rowID >= 2 && (newEmoticon.getBitmap()
+                        .sameAs(emoticonArray[rowID - 1][columnID].getBitmap()) &&
+                        newEmoticon.getBitmap().sameAs(emoticonArray[rowID - 2][columnID].getBitmap()))) ||
                         (columnID >= 2 &&
                                 (newEmoticon.getBitmap().sameAs(emoticonArray[rowID][columnID - 1].getBitmap()) &&
                                         newEmoticon.getBitmap().sameAs(emoticonArray[rowID][columnID - 2].getBitmap()))));
+
                 emoticonArray[rowID][columnID] = newEmoticon;
             }
         }
