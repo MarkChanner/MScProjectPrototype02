@@ -78,16 +78,16 @@ public class GameView extends View {
         Emoticon newEmoticon;
         for (int rowID = 0; rowID < 8; rowID++) {
             for (int columnID = 0; columnID < 7; columnID++) {
-
+                // While the randomly generated Bitmap would mean 3 of the same
+                // type in a row keep randomly generating a different Bitmap
                 do {
-                    /** "the newEmoticon =" line below moved into do loop from above do loop */
                     newEmoticon = generateRandomEmoticon(rowID, columnID);
                 } while ((rowID >= 2 &&
-                        (newEmoticon.getType().equals(emoticonArray[rowID - 1][columnID].getBitmapType()) &&
-                                newEmoticon.getType().equals(emoticonArray[rowID - 2][columnID].getBitmapType()))) ||
+                        (newEmoticon.getBitmap().sameAs(emoticonArray[rowID - 1][columnID].getBitmap()) &&
+                                newEmoticon.getBitmap().sameAs(emoticonArray[rowID - 2][columnID].getBitmap()))) ||
                         (columnID >= 2 &&
-                                (newEmoticon.getType().equals(emoticonArray[rowID][columnID - 1].getBitmapType()) &&
-                                        newEmoticon.getType().equals(emoticonArray[rowID][columnID - 2].getBitmapType()))));
+                                (newEmoticon.getBitmap().sameAs(emoticonArray[rowID][columnID - 1].getBitmap()) &&
+                                        newEmoticon.getBitmap().sameAs(emoticonArray[rowID][columnID - 2].getBitmap()))));
                 emoticonArray[rowID][columnID] = newEmoticon;
             }
         }
