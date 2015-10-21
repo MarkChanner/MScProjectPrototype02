@@ -8,18 +8,18 @@ import android.graphics.Bitmap;
  * Consider having a class that is just for behaviour and does not
  * contain anything related to graphics or sound
  */
-public class Emoticon {
+public abstract class Emoticon {
 
     private Bitmap bitmap;
-    private String type;
+    private String face;
     private int row;
     private int column;
     private int x;
     private int y;
 
-    public Emoticon(Bitmap b, int r, int c) {
+    public Emoticon(Bitmap b, String f, int r, int c) {
         bitmap = b;
-        type = ""; // this will give the type of emoticon for comparison
+        face = f;
         row = r;
         column = c;
         // x = WILL NEED TO GET LOCATION OF EMOTICON ON SCREEN FOR ANIMATION
@@ -34,12 +34,12 @@ public class Emoticon {
         bitmap = b;
     }
 
-    public String getType() {
-        return type;
+    public String getFace() {
+        return face;
     }
 
-    public void setType(String t) {
-        type = t;
+    public void setFace(String f) {
+        face = f;
     }
 
     public int getColumn() {
