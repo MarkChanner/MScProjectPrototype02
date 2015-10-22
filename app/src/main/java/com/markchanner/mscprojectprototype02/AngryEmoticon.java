@@ -5,9 +5,21 @@ import android.graphics.Bitmap;
 /**
  * @author Mark Channer for Birkbeck MSc Computer Science project
  */
-public class AngryEmoticon extends Emoticon {
+public class AngryEmoticon extends AbstractEmoticon {
 
-    public AngryEmoticon(Bitmap b, int r, int c) {
-        super (b, "ANGRY", r, c);
+    public AngryEmoticon(Bitmap b) {
+        super (b, "ANGRY");
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Emoticon retrieveEmoticon() {
+        return (this);
+    }
+
 }
+
+
+

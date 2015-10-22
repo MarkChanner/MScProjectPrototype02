@@ -3,74 +3,44 @@ package com.markchanner.mscprojectprototype02;
 import android.graphics.Bitmap;
 
 /**
- * @author Mark Channer for Birkbeck MSc Computer Science project
+ * A game piece, such as an emoticon for a tile matching game.
  *
- * Consider having a class that is just for behaviour and does not
- * contain anything related to graphics or sound
+ * @author Mark Channer for first prototype of Birkbeck MSc Computer Science final project
  */
-public abstract class Emoticon {
+public interface Emoticon {
 
-    private Bitmap bitmap;
-    private String face;
-    private int row;
-    private int column;
-    private int x;
-    private int y;
+    /**
+     *
+     * @return Bitmap the bitmap representing the emotion
+     */
+    Bitmap getBitmap();
 
-    public Emoticon(Bitmap b, String f, int r, int c) {
-        bitmap = b;
-        face = f;
-        row = r;
-        column = c;
-        // x = WILL NEED TO GET LOCATION OF EMOTICON ON SCREEN FOR ANIMATION
-        // y = WILL NEED TO GET LOCATION OF EMOTICON ON SCREEN FOR ANIMATION
-    }
+    /**
+     * @param b
+     */
+    void setBitmap(Bitmap b);
 
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
+    /**
+     * Sets the position of the element that implements GamePiece in the board.
+     *
+     * @param row    the row number that the piece is located on the board
+     * @param column the column number that the piece is located on the board
+     */
+    void setCoordinates(int row, int column);
 
-    public void setBitmap(Bitmap b) {
-        bitmap = b;
-    }
+    /**
+     * Called from a board Tile that needs to access the Emoticon it is housing
+     *
+     * @return the Emoticon situated on that Tile
+     */
+    Emoticon retrieveEmoticon();
 
-    public String getFace() {
-        return face;
-    }
+    /**
+     * Gives the particular type of the Emoticon (such as 'HAPPY', 'ANGRY', etc)
+     *
+     * @return a String that gives the type of the GamePiece
+     */
+    String showType();
 
-    public void setFace(String f) {
-        face = f;
-    }
-
-    public int getColumn() {
-        return column;
-    }
-
-    public void setColumn(int c) {
-        column = c;
-    }
-
-    public int getRow() {
-        return row;
-    }
-
-    public void setRow(int r) {
-        row = r;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = this.x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
 }
+

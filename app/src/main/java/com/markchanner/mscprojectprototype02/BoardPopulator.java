@@ -1,7 +1,39 @@
 package com.markchanner.mscprojectprototype02;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+
 /**
- * Created by Mark on 21/10/2015.
+ * Implementations of this interface are used to populate the Board with game pieces.
+ * For testing purposes, an implementation can populate the board with a set layout,
+ * rather than at random, which would make testing difficult.
+ *
+ * @author Mark Channer for first prototype of Birkbeck MSc Computer Science final project
+ *
  */
 public interface BoardPopulator {
+
+    /**
+     * Populates the given Board with game pieces
+     *
+     * @param view element to be populated with game pieces
+     */
+    void populate(GameView view, Context context, int emoticonWidth, int emoticonHeight);
+
+    /**
+     *
+     *
+     *
+     */
+    void createBitmaps(Context context, int emoticonWidth, int emoticonHeight);
+
+    /**
+     * Creates a game piece
+     *
+     * @return a game piece
+     */
+    Emoticon generateRandomEmoticon();
+
+    Bitmap getEmptyBitmap();
+
 }
