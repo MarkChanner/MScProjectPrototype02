@@ -7,12 +7,12 @@ import android.graphics.BitmapFactory;
 import java.util.Random;
 
 /**
- * Implementation of the BoardPopulator interface that populates a Board with GamePieces
+ * Implementation of the BoardPopulator interface that populates a Board with Emoticons
  * at random. However, as this class is used for a matching game where the objective is
- * to match 3 consecutive game pieces, it ensures that 3 consecutive pieces would not
+ * to match 3 consecutive Emoticons, it ensures that 3 consecutive pieces would not
  * be formed at the outset.
  *
- * @author Mark Channer for first prototype of Birkbeck MSc Computer Science final project
+ * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public class BoardPopulatorImpl implements BoardPopulator {
 

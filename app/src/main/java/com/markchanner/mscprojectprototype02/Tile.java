@@ -5,7 +5,7 @@ package com.markchanner.mscprojectprototype02;
  * accessing the location of the AbstractEmoticon's position, and for retrieving
  * both the type of GamePiece occupying it and what type GamePiece it is
  *
- * @author Mark Channer for first prototype of Birkbeck MSc Computer Science project
+ * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public interface Tile {
 

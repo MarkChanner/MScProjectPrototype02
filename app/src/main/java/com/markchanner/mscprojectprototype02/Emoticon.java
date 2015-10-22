@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 /**
  * A game piece, such as an emoticon for a tile matching game.
  *
- * @author Mark Channer for first prototype of Birkbeck MSc Computer Science final project
+ * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public interface Emoticon {
 

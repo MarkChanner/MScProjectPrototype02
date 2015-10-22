@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
  * For testing purposes, an implementation can populate the board with a set layout,
  * rather than at random, which would make testing difficult.
  *
- * @author Mark Channer for first prototype of Birkbeck MSc Computer Science final project
+ * @author Mark Channer for Birkbeck MSc Computer Science project
  *
  */
 public interface BoardPopulator {

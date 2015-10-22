@@ -17,6 +17,8 @@ public class GameActivity extends Activity {
         // Sets to full screen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(new GameView(this));
+
+        GameView view = new GameView(this, new BoardPopulatorMock01(), new MatchFinderImpl());
+        setContentView(view);
     }
 }

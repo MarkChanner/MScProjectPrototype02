@@ -38,15 +38,15 @@ public class GameView extends View {
     private int[] userSelection02 = new int[2];
     private boolean firstSelectionMade;
 
-    public GameView(Context context) {
-        super(context);
-        this.context = context;
+    public GameView(Context theContext, BoardPopulator bp, MatchFinderImpl mf) {
+        super(theContext);
+        context = theContext;
         context.getResources();
+        populator = bp;
+        matchFinder = mf;
+        tiles = new TileImpl[NUM_ROWS][NUM_COLS];
         backgroundColour = new Paint();
         gridLineColour = new Paint();
-        tiles = new TileImpl[NUM_ROWS][NUM_COLS];
-        populator = new BoardPopulatorImpl();
-        matchFinder = new MatchFinderImpl(); /** Consider initializing in GameActivity and passing to GameViewConstructor, like Java version */
         resetUserSelections();
     }
 
@@ -209,9 +209,9 @@ public class GameView extends View {
     }
 
     private void updateBoard(ArrayList<LinkedList<Tile>> matchingColumns, ArrayList<LinkedList<Tile>> matchingRows) {
-        //removeFromBoard(matchingColumns);
-        //removeFromBoard(matchingRows);
-        do {
+        removeFromBoard(matchingColumns);
+        removeFromBoard(matchingRows);
+        /*do {
             //giveReward(matchingColumns, matchingRows);
             removeFromBoard(matchingColumns);
             removeFromBoard(matchingRows);
@@ -219,7 +219,7 @@ public class GameView extends View {
             insertNewIcons();
             matchingColumns = matchFinder.findMatchingColumns(this);
             matchingRows = matchFinder.findMatchingRows(this);
-        } while (matchesFound(matchingColumns, matchingRows));
+        } while (matchesFound(matchingColumns, matchingRows));*/
     }
 
     private void giveReward(ArrayList<LinkedList<Tile>> matchingColumns, ArrayList<LinkedList<Tile>> matchingRows) {

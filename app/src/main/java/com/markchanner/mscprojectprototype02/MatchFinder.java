@@ -8,7 +8,7 @@ import java.util.LinkedList;
  * Finds and returns an ArrayList that contains Lists of rows or columns that have tiles
  * containing game pieces of the same type.
  *
- * @author Mark Channer for first prototype of Birkbeck MSc Computer Science final project
+ * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public interface MatchFinder {
 

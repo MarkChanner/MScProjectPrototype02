@@ -7,7 +7,7 @@ import java.util.ArrayList;
  * Finds and returns an ArrayList that contains a List/Lists of rows or columns that has a
  * succession of tiles that contain a game piece of the same type.
  *
- * @author Mark Channer for first prototype of Birkbeck MSc Computer Science final project
+ * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public class MatchFinderImpl implements MatchFinder {
 
@@ -33,7 +33,7 @@ public class MatchFinderImpl implements MatchFinder {
         ArrayList<LinkedList<Tile>> bigList = new ArrayList<>();
         Tile tile;
         for (int col = 0; col < colSize; col++) {
-            consecutivePieces.add(tiles[colSize - 1][col]);
+            consecutivePieces.add(tiles[colSize - 1][col]); /* Better not to have col twice */
 
             for (int row = (rowSize - 2); row >= 0; row--) {
                 tile = tiles[row][col];
