@@ -26,23 +26,23 @@ public class MatchFinderImpl implements MatchFinder {
     @Override
     public ArrayList<LinkedList<Tile>> findMatchingColumns(GameView gameView) {
         Tile[][] tiles = gameView.getTiles();
-        int rowSize = gameView.getRows();
-        int colSize = gameView.getCols();
+        int xMax = gameView.getX_MAX();
+        int yMax = gameView.getY_MAX();
 
         LinkedList<Tile> consecutivePieces = new LinkedList<>();
         ArrayList<LinkedList<Tile>> bigList = new ArrayList<>();
         Tile tile;
-        for (int col = 0; col < colSize; col++) {
-            consecutivePieces.add(tiles[colSize - 1][col]); /* Better not to have col twice */
+        for (int x = 0; x < xMax; x++) {
+            consecutivePieces.add(tiles[x][0]);
 
-            for (int row = (rowSize - 2); row >= 0; row--) {
-                tile = tiles[row][col];
+            for (int y = 1; y < yMax; y++) {
+                tile = tiles[x][y];
                 if (!tile.getEmoticonType().equals(consecutivePieces.getLast().getEmoticonType())) {
                     examineList(consecutivePieces, bigList);
                     consecutivePieces = new LinkedList<>();
                 }
                 consecutivePieces.add(tile);
-                if (row == 0) {
+                if (y == yMax - 1) {
                     examineList(consecutivePieces, bigList);
                     consecutivePieces = new LinkedList<>();
                 }
@@ -66,23 +66,23 @@ public class MatchFinderImpl implements MatchFinder {
     @Override
     public ArrayList<LinkedList<Tile>> findMatchingRows(GameView gameView) {
         Tile[][] tiles = gameView.getTiles();
-        int rowSize = gameView.getRows();
-        int colSize = gameView.getCols();
+        int xMax = gameView.getX_MAX();
+        int yMax = gameView.getY_MAX();
         LinkedList<Tile> consecutiveTiles = new LinkedList<>();
         ArrayList<LinkedList<Tile>> bigList = new ArrayList<>();
         Tile tile;
 
-        for (int row = (rowSize - 1); row >= 0; row--) {
-            consecutiveTiles.add(tiles[row][0]);
+        for (int y = 0; y < yMax; y++) {
+            consecutiveTiles.add(tiles[0][y]);
 
-            for (int col = 1; col < colSize; col++) {
-                tile = tiles[row][col];
+            for (int x = 1; x < xMax; x++) {
+                tile = tiles[x][y];
                 if (!tile.getEmoticonType().equals(consecutiveTiles.getLast().getEmoticonType())) {
                     examineList(consecutiveTiles, bigList);
                     consecutiveTiles = new LinkedList<>();
                 }
                 consecutiveTiles.add(tile);
-                if (col == colSize - 1) {
+                if (x == xMax - 1) {
                     examineList(consecutiveTiles, bigList);
                     consecutiveTiles = new LinkedList<>();
                 }

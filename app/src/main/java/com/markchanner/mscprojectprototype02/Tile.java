@@ -10,18 +10,18 @@ package com.markchanner.mscprojectprototype02;
 public interface Tile {
 
     /**
-     * Returns the row at the specified position in the array
-     *
-     * @return the row location of this tile
-     */
-    int getRow();
-
-    /**
      * Returns the column at the specified position in the array
      *
      * @return the column location of the AbstractEmoticon
      */
-    int getColumn();
+    int getX();
+
+    /**
+     * Returns the row at the specified position in the array
+     *
+     * @return the row location of this tile
+     */
+    int getY();
 
     /**
      * Returns the GameInitializer Piece occupying the AbstractEmoticon

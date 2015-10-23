@@ -1,27 +1,26 @@
 package com.markchanner.mscprojectprototype02;
 
 /**
- * An implementation of the AbstractEmoticon interface. Implements all interface
- * methods. A GamePiece object
+ * An implementation of the Tile interface.
  *
  * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public class TileImpl implements Tile {
 
-    private int row;
-    private int column;
+    private int x;
+    private int y;
     private Emoticon emoticon;
 
-    public TileImpl(int r, int c, Emoticon e) {
-        row = r;
-        column = c;
+    public TileImpl(int x, int y, Emoticon e) {
+        this.x = x;
+        this.y = y;
         emoticon = e;
-        emoticon.setCoordinates(row, column);
+        emoticon.setCoordinates(this.x, this.y);
     }
 
-    public TileImpl(int r, int c) {
-        row = r;
-        column = c;
+    public TileImpl(int x, int y) {
+        this.x = x;
+        this.y = y;
         emoticon = null;
     }
 
@@ -29,16 +28,16 @@ public class TileImpl implements Tile {
      * {@inheritDoc}
      */
     @Override
-    public int getRow() {
-        return row;
+    public int getX() {
+        return x;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int getColumn() {
-        return column;
+    public int getY() {
+        return y;
     }
 
     /**
@@ -49,7 +48,7 @@ public class TileImpl implements Tile {
         if (emoticon != null) {
             return emoticon.retrieveEmoticon();
         } else {
-            throw new NullPointerException("GamePiece is not set");
+            throw new NullPointerException("Emoticon is not set");
         }
     }
 
@@ -59,7 +58,7 @@ public class TileImpl implements Tile {
     @Override
     public void setEmoticon(Emoticon e) {
         emoticon = e;
-        emoticon.setCoordinates(row, column);
+        emoticon.setCoordinates(x, y);
     }
 
     /**
@@ -70,7 +69,7 @@ public class TileImpl implements Tile {
         if (emoticon != null) {
             return emoticon.showType();
         } else {
-            throw new NullPointerException("GameInitializer Piece is not set");
+            throw new NullPointerException("Emoticon type is not set");
         }
 
     }

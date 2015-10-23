@@ -24,16 +24,15 @@ public class BoardPopulatorMock01 implements BoardPopulator {
     public void populate(GameView view, Context context, int emoticonWidth, int emoticonHeight) {
 
         createBitmaps(context, emoticonWidth, emoticonHeight);
-        int rows = view.getRows();
-        int cols = view.getCols();
+        int maxX = view.getX_MAX();
+        int maxY = view.getY_MAX();
         Tile[][] tiles = view.getTiles();
         int counter = 0;
-
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                if (tiles[row][col] == null) {
+        for (int x = 0; x < maxX; x++) {
+            for (int y = 0; y < maxY; y++) {
+                if (tiles[x][y] == null) {
                     String str = counter <= 9 ? "0" + counter : "" + counter;
-                    tiles[row][col] = new TileImpl(row, col, new MockEmoticon(emptyBitmap, str));
+                    tiles[x][y] = new TileImpl(x, y, new MockEmoticon(emptyBitmap, str));
                     counter++;
                 }
             }
@@ -41,23 +40,23 @@ public class BoardPopulatorMock01 implements BoardPopulator {
 
         // Sets up tiles so that a match of HappyEmoticons in a row
         // and a match of EmbarrassedEmoticons in a column can occur
-        // when tiles 3,0 and 4,0 are selected
-        tiles[1][0] = new TileImpl(1, 0, new SurprisedEmoticon(surprisedBitmap));
-        tiles[2][0] = new TileImpl(2, 0, new SurprisedEmoticon(surprisedBitmap));
-        tiles[3][0] = new TileImpl(3, 0, new EmbarrassedEmoticon(embarrassedBitmap));
-        tiles[4][0] = new TileImpl(4, 0, new SurprisedEmoticon(surprisedBitmap));
-        tiles[4][1] = new TileImpl(4, 1, new EmbarrassedEmoticon(embarrassedBitmap));
-        tiles[4][2] = new TileImpl(4, 2, new EmbarrassedEmoticon(embarrassedBitmap));
+        // when tiles 0,3 and 0,4 are selected
+        tiles[0][1] = new TileImpl(0, 1, new SurprisedEmoticon(surprisedBitmap));
+        tiles[0][2] = new TileImpl(0, 2, new SurprisedEmoticon(surprisedBitmap));
+        tiles[0][3] = new TileImpl(0, 3, new EmbarrassedEmoticon(embarrassedBitmap));
+        tiles[0][4] = new TileImpl(0, 4, new SurprisedEmoticon(surprisedBitmap));
+        tiles[1][4] = new TileImpl(1, 4, new EmbarrassedEmoticon(embarrassedBitmap));
+        tiles[2][4] = new TileImpl(2, 4, new EmbarrassedEmoticon(embarrassedBitmap));
 
         // Sets up tiles so that a match of AngryEmoticons in a row
         // and a match of UpsetEmoticons in a column can occur when
-        // tiles at locations (3,3) and (3,4) are selected
+        // tiles at locations (3,3) and (4,3) are selected
         tiles[3][3] = new TileImpl(3, 3, new UpsetEmoticon(upsetBitmap));
-        tiles[3][4] = new TileImpl(3, 4, new AngryEmoticon(angryBitmap));
-        tiles[3][5] = new TileImpl(3, 5, new UpsetEmoticon(upsetBitmap));
-        tiles[3][6] = new TileImpl(3, 6, new UpsetEmoticon(upsetBitmap));
+        tiles[4][3] = new TileImpl(4, 3, new AngryEmoticon(angryBitmap));
+        tiles[5][3] = new TileImpl(5, 3, new UpsetEmoticon(upsetBitmap));
+        tiles[6][3] = new TileImpl(6, 3, new UpsetEmoticon(upsetBitmap));
         tiles[4][4] = new TileImpl(4, 4, new UpsetEmoticon(upsetBitmap));
-        tiles[5][4] = new TileImpl(5, 4, new UpsetEmoticon(upsetBitmap));
+        tiles[4][5] = new TileImpl(4, 5, new UpsetEmoticon(upsetBitmap));
     }
 
     @Override

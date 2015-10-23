@@ -32,22 +32,22 @@ public class BoardPopulatorImpl implements BoardPopulator {
     @Override
     public void populate(GameView view, Context context, int emoticonWidth, int emoticonHeight) {
         createBitmaps(context, emoticonWidth, emoticonHeight);
-        int rows = view.getRows();
-        int cols = view.getCols();
+        int maxX = view.getX_MAX();
+        int maxY = view.getY_MAX();
         Tile[][] tiles = view.getTiles();
         Emoticon newEmoticon;
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
+        for (int x = 0; x < maxX; x++) {
+            for (int y = 0; y < maxY; y++) {
                 do {
                     newEmoticon = generateRandomEmoticon();
-                } while ((row >= 2 &&
-                        (newEmoticon.showType().equals(tiles[row - 1][col].getEmoticonType()) &&
-                                newEmoticon.showType().equals(tiles[row - 2][col].getEmoticonType()))) ||
-                        (col >= 2 &&
-                                (newEmoticon.showType().equals(tiles[row][col - 1].getEmoticonType()) &&
-                                        newEmoticon.showType().equals(tiles[row][col - 2].getEmoticonType()))));
+                } while ((y >= 2 &&
+                        (newEmoticon.showType().equals(tiles[x][y - 1].getEmoticonType()) &&
+                                newEmoticon.showType().equals(tiles[x][y - 2].getEmoticonType()))) ||
+                        (x >= 2 &&
+                                (newEmoticon.showType().equals(tiles[x - 1][y].getEmoticonType()) &&
+                                        newEmoticon.showType().equals(tiles[x - 2][y].getEmoticonType()))));
 
-                tiles[row][col] = new TileImpl(row, col, newEmoticon);
+                tiles[x][y] = new TileImpl(x, y, newEmoticon);
             }
         }
     }

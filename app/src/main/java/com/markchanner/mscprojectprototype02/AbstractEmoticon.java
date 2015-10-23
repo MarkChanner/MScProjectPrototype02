@@ -30,9 +30,9 @@ public abstract class AbstractEmoticon implements Emoticon {
         bitmap = b;
     }
 
-    public void setCoordinates(int row, int column) {
-        coordinates[0] = row;
-        coordinates[1] = column;
+    public void setCoordinates(int x, int y) {
+        coordinates[0] = x;
+        coordinates[1] = y;
     }
 
     public abstract Emoticon retrieveEmoticon();

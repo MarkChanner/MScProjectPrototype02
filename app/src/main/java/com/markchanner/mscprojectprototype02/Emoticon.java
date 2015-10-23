@@ -23,10 +23,10 @@ public interface Emoticon {
     /**
      * Sets the position of the element that implements GamePiece in the board.
      *
-     * @param row    the row number that the piece is located on the board
-     * @param column the column number that the piece is located on the board
+     * @param x the column number that the piece is located on the board
+     * @param y    the row number that the piece is located on the board
      */
-    void setCoordinates(int row, int column);
+    void setCoordinates(int x, int y);
 
     /**
      * Called from a board Tile that needs to access the Emoticon it is housing

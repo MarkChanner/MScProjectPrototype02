@@ -13,6 +13,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * LIST OF CHANGES REGARDING PROBLEM WITH GRID:
+ * 1. SET COLUMN AND ROW TO DIFFERENT SIZE SO CAN TELL IF SOMETHING WRONG
+ * 2. onSizeChanged() method: emoticonWidth = screenWidth / X_MAX; - This makes more sense
+ * 3. onDraw() method: Check all these values very carefully
+ * 4. DECIDED TO CHANGE EVERYTHING TO X, Y - IT WILL AVOID CONFUSION
+ *
+ *
  * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public class GameView extends View {
@@ -26,11 +33,11 @@ public class GameView extends View {
     private int emoticonHeight;
 
 
-    private static final int ZERO = 0;
-    private static final int ONE = 1;
+    private static final int X_VAL = 0;
+    private static final int Y_VAL = 1;
 
-    private final int NUM_ROWS = 8;
-    private final int NUM_COLS = 8;
+    private final int X_MAX = 2;
+    private final int Y_MAX = 2;
     private MatchFinder matchFinder;
     private BoardPopulator populator;
     private Tile[][] tiles;
@@ -44,20 +51,19 @@ public class GameView extends View {
         context.getResources();
         populator = bp;
         matchFinder = mf;
-        tiles = new TileImpl[NUM_ROWS][NUM_COLS];
+        tiles = new TileImpl[X_MAX][Y_MAX];
         backgroundColour = new Paint();
         gridLineColour = new Paint();
         resetUserSelections();
     }
 
-    public int getRows() {
-        return NUM_ROWS;
+    public int getX_MAX() {
+        return X_MAX;
     }
 
-    public int getCols() {
-        return NUM_COLS;
+    public int getY_MAX() {
+        return Y_MAX;
     }
-
     public Tile[][] getTiles() {
         if (tiles == null) {
             throw new NullPointerException(); /* Exceptions need work */
@@ -68,41 +74,48 @@ public class GameView extends View {
 
     private void resetUserSelections() {
         firstSelectionMade = false;
-        userSelection01[ZERO] = -1;
-        userSelection01[ONE] = -1;
-        userSelection02[ZERO] = -1;
-        userSelection02[ONE] = -1;
+        userSelection01[X_VAL] = -1;
+        userSelection01[Y_VAL] = -1;
+        userSelection02[X_VAL] = -1;
+        userSelection02[Y_VAL] = -1;
     }
 
+/** Android screen coordinate referencing is in the opposite order (col,row)!!! */
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH) {
         super.onSizeChanged(w, h, oldW, oldH);
         screenWidth = w;
         screenHeight = h;
-        emoticonWidth = screenWidth / NUM_ROWS;
-        emoticonHeight = screenHeight / NUM_COLS;
+        emoticonWidth = screenWidth / X_MAX;
+        emoticonHeight = screenHeight / Y_MAX;
         populator.populate(this, context, emoticonWidth, emoticonHeight);
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
+        final int ZERO = 0;
         // Draws a rectangle with sky blue centre
         backgroundColour.setColor(Color.parseColor("#7EC0EE"));
-        canvas.drawRect(0, 0, getWidth(), getHeight(), backgroundColour);
+        canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
 
         // Draws grid lines within rectangle
         gridLineColour.setStrokeWidth(2f);
         gridLineColour.setColor(Color.BLACK);
-        for (int i = 0; i < NUM_ROWS; i++) {
-            canvas.drawLine(0, i * emoticonHeight, getWidth(), i * emoticonHeight, gridLineColour);
-            canvas.drawLine(i * emoticonWidth, 0, i * emoticonWidth, getHeight(), gridLineColour);
+        /** !!!!!!!!!!!!!!!!!!!!! change this loop to x after and alter drawLine accordingly !!!!*/
+        for (int y = 0; y < Y_MAX; y++) {
+            // Draw  grid lines
+            /** check if horizontal or vertical */
+            canvas.drawLine(ZERO, y * emoticonHeight, getWidth(), y * emoticonHeight, gridLineColour);
+            //Draw  grid lines
+            canvas.drawLine(y * emoticonWidth, ZERO, y * emoticonWidth, getHeight(), gridLineColour);
         }
         // Draws emoticonList on canvas
-        for (int row = 0; row < NUM_ROWS; row++) {
-            for (int col = 0; col < NUM_COLS; col++) {
-                Emoticon e = tiles[row][col].getEmoticon();
-                canvas.drawBitmap(e.getBitmap(), row * emoticonWidth, col * emoticonHeight, null);
+        /** !!!!!!!!!!!!!!!!!!!!!!!confirm if horizontal or vertical */
+        for (int x = 0; x < X_MAX; x++) {
+            for (int y = 0; y < Y_MAX; y++) {
+                Emoticon e = tiles[x][y].getEmoticon();
+                canvas.drawBitmap(e.getBitmap(), x * emoticonWidth, y * emoticonHeight, null);
             }
         }
     }
@@ -120,15 +133,15 @@ public class GameView extends View {
         return true;
     }
 
-    public void selectTile(int row, int column) {
+    public void selectTile(int x, int y) {
         if (!(firstSelectionMade)) {
             firstSelectionMade = true;
-            userSelection01[ZERO] = row;
-            userSelection01[ONE] = column;
+            userSelection01[X_VAL] = x;
+            userSelection01[Y_VAL] = y;
         } else {
             if (!sameTileSelectedTwice()) {
-                userSelection02[ZERO] = row;
-                userSelection02[ONE] = column;
+                userSelection02[X_VAL] = x;
+                userSelection02[Y_VAL] = y;
                 checkValidSelections();
             }
         }
@@ -140,10 +153,10 @@ public class GameView extends View {
                 compareTileContents();
             } else {
                 /*  Selections not adjacent. Last selection becomes first selection */
-                userSelection01[ZERO] = userSelection02[ZERO];
-                userSelection01[ONE] = userSelection02[ONE];
-                userSelection02[ZERO] = -1;
-                userSelection02[ONE] = -1;
+                userSelection01[X_VAL] = userSelection02[X_VAL];
+                userSelection01[Y_VAL] = userSelection02[Y_VAL];
+                userSelection02[X_VAL] = -1;
+                userSelection02[Y_VAL] = -1;
             }
         } else {
             /* Same selection made twice. Reset selections */
@@ -152,15 +165,15 @@ public class GameView extends View {
     }
 
     private boolean sameTileSelectedTwice() {
-        return ((userSelection01[ZERO] == userSelection02[ZERO]) && (userSelection01[ONE] == userSelection02[ONE]));
+        return ((userSelection01[X_VAL] == userSelection02[X_VAL]) && (userSelection01[Y_VAL] == userSelection02[Y_VAL]));
     }
 
     private boolean selectedTilesAreAdjacent() {
-        if ((userSelection01[ZERO] == userSelection02[ZERO]) &&
-                (userSelection01[ONE] == (userSelection02[ONE] + 1) || userSelection01[ONE] == (userSelection02[ONE] - 1))) {
+        if ((userSelection01[X_VAL] == userSelection02[X_VAL]) &&
+                (userSelection01[Y_VAL] == (userSelection02[Y_VAL] + 1) || userSelection01[Y_VAL] == (userSelection02[Y_VAL] - 1))) {
             return true;
-        } else if ((userSelection01[ONE] == userSelection02[ONE]) &&
-                (userSelection01[ZERO] == (userSelection02[ZERO] + 1) || userSelection01[ZERO] == (userSelection02[ZERO] - 1))) {
+        } else if ((userSelection01[Y_VAL] == userSelection02[Y_VAL]) &&
+                (userSelection01[X_VAL] == (userSelection02[X_VAL] + 1) || userSelection01[X_VAL] == (userSelection02[X_VAL] - 1))) {
             return true;
         }
         return false;
@@ -177,30 +190,24 @@ public class GameView extends View {
     }
 
     private boolean differentPieceTypes() {
-        return (!(tiles[userSelection01[ZERO]][userSelection01[ONE]].getEmoticonType()
-                .equals(tiles[userSelection02[ZERO]][userSelection02[ONE]].getEmoticonType())));
+        return (!(tiles[userSelection01[X_VAL]][userSelection01[Y_VAL]].getEmoticonType()
+                .equals(tiles[userSelection02[X_VAL]][userSelection02[Y_VAL]].getEmoticonType())));
     }
 
     private void swapPieces() {
-        Emoticon tempEmoticon = tiles[userSelection01[ZERO]][userSelection01[ONE]].getEmoticon();
-        tiles[userSelection01[ZERO]][userSelection01[ONE]].setEmoticon(tiles[userSelection02[ZERO]][userSelection02[ONE]].getEmoticon());
-        tiles[userSelection02[ZERO]][userSelection02[ONE]].setEmoticon(tempEmoticon);
+        Emoticon tempEmoticon = tiles[userSelection01[X_VAL]][userSelection01[Y_VAL]].getEmoticon();
+        tiles[userSelection01[X_VAL]][userSelection01[Y_VAL]].setEmoticon(tiles[userSelection02[X_VAL]][userSelection02[Y_VAL]].getEmoticon());
+        tiles[userSelection02[X_VAL]][userSelection02[Y_VAL]].setEmoticon(tempEmoticon);
     }
 
     private void findMatches() {
-        ArrayList<LinkedList<Tile>> matchingColumns = matchFinder.findMatchingColumns(this);
-        ArrayList<LinkedList<Tile>> matchingRows = matchFinder.findMatchingRows(this);
-        if (matchesFound(matchingColumns, matchingRows)) {
-            updateBoard(matchingColumns, matchingRows);
+        ArrayList<LinkedList<Tile>> matchingX = matchFinder.findMatchingColumns(this);
+        ArrayList<LinkedList<Tile>> matchingY = matchFinder.findMatchingRows(this);
+        if (matchesFound(matchingX, matchingY)) {
+            updateBoard(matchingX, matchingY);
         } else {
             // The swap did not yield a match, so pieces swapped back to previous position
             swapPieces();
-        }
-    }
-
-    private void checkForThreeOrMoreMatches(LinkedList<Tile> consecutiveEmoticons, ArrayList<LinkedList<Tile>> bigList) {
-        if (consecutiveEmoticons.size() >= 3) {
-            bigList.add(consecutiveEmoticons);
         }
     }
 
@@ -208,12 +215,13 @@ public class GameView extends View {
         return (!(matchingColumns.isEmpty() && matchingRows.isEmpty()));
     }
 
+    /** update variable names and probably method logic! */
     private void updateBoard(ArrayList<LinkedList<Tile>> matchingColumns, ArrayList<LinkedList<Tile>> matchingRows) {
         removeFromBoard(matchingColumns);
         removeFromBoard(matchingRows);
-        /*do {
+       /* do {
             //giveReward(matchingColumns, matchingRows);
-            removeFromBoard(matchingColumns);
+            /*removeFromBoard(matchingColumns);
             removeFromBoard(matchingRows);
             shiftIconsDown();
             insertNewIcons();
@@ -234,45 +242,47 @@ public class GameView extends View {
     }
 
     private void removeFromBoard(ArrayList<LinkedList<Tile>> matches) {
-        for (List<Tile> rowList : matches) {
-            for (Tile t : rowList) {
-                int theRow = t.getRow();
-                int theCol = t.getColumn();
-                if (!(tiles[theRow][theCol].getEmoticonType().equals("EMPTY"))) {
+        for (List<Tile> killList : matches) {
+            for (Tile t : killList) {
+                int x = t.getX();
+                int y = t.getY();
+
+                if (!(tiles[x][y].getEmoticonType().equals("EMPTY"))) {
                     Bitmap empty = populator.getEmptyBitmap();
-                    tiles[theRow][theCol].setEmoticon(new EmptyEmoticon(empty));
+                    tiles[x][y].setEmoticon(new EmptyEmoticon(empty));
                 }
             }
         }
     }
 
+    /** This will need changing when animation is involved */
     private void shiftIconsDown() {
-        for (int col = 0; col < NUM_COLS; col++) {
-            for (int row = (NUM_ROWS - 1); row >= 0; row--) {
-                if (tiles[row][col].getEmoticonType().equals("EMPTY")) {
+        for (int x = 0; x < X_MAX; x++) {
+            for (int y = 0; y < Y_MAX; y++) {
+                if (tiles[x][y].getEmoticonType().equals("EMPTY")) {
                     // get any pieces higher up the column and, if found, plug hole with it
-                    int tempRow = row;
-                    while ((tempRow >= 0) && (tiles[tempRow][col].getEmoticonType().equals("EMPTY"))) {
-                        tempRow--;
+                    int tempY = y;
+                    while ((tempY < Y_MAX) && (tiles[x][tempY].getEmoticonType().equals("EMPTY"))) {
+                        tempY++;
                     }
-                    if (tempRow >= 0) {
-                        Emoticon e = tiles[tempRow][col].getEmoticon();
-                        tiles[row][col].setEmoticon(e);
+                    if (tempY < Y_MAX) {
+                        Emoticon e = tiles[x][tempY].getEmoticon();
+                        tiles[x][y].setEmoticon(e);
                         /* sets previous tile to be empty */
                         Bitmap empty = populator.getEmptyBitmap();
-                        tiles[tempRow][col].setEmoticon(new EmptyEmoticon(empty));
+                        tiles[x][tempY].setEmoticon(new EmptyEmoticon(empty));
                     }
                 }
             }
         }
     }
-
+    /** This will need changing when animation is involved */
     private void insertNewIcons() {
-        for (int row = 0; row < NUM_ROWS; row++) {
-            for (int col = 0; col < NUM_COLS; col++) {
-                if (tiles[row][col].getEmoticonType().equals("EMPTY")) {
+        for (int x = 0; x < X_MAX; x++) {
+            for (int y = 0; y < Y_MAX; y++) {
+                if (tiles[x][y].getEmoticonType().equals("EMPTY")) {
                     Emoticon e = populator.generateRandomEmoticon();
-                    tiles[row][col].setEmoticon(e);
+                    tiles[x][y].setEmoticon(e);
                 }
             }
         }
