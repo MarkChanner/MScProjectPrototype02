@@ -29,22 +29,23 @@ public class MatchFinderImpl implements MatchFinder {
         int xMax = gameView.getX_MAX();
         int yMax = gameView.getY_MAX();
 
-        LinkedList<Tile> consecutivePieces = new LinkedList<>();
+        LinkedList<Tile> consecutiveEmoticons = new LinkedList<>();
         ArrayList<LinkedList<Tile>> bigList = new ArrayList<>();
         Tile tile;
-        for (int x = 0; x < xMax; x++) {
-            consecutivePieces.add(tiles[x][0]);
 
+        for (int x = 0; x < xMax; x++) {
+            consecutiveEmoticons.add(tiles[x][0]);
+            /** combine two if statemens into on if statement with an OR to avoid repetition of examineList, etc*/
             for (int y = 1; y < yMax; y++) {
                 tile = tiles[x][y];
-                if (!tile.getEmoticonType().equals(consecutivePieces.getLast().getEmoticonType())) {
-                    examineList(consecutivePieces, bigList);
-                    consecutivePieces = new LinkedList<>();
+                if (!tile.getEmoticonType().equals(consecutiveEmoticons.getLast().getEmoticonType())) {
+                    examineList(consecutiveEmoticons, bigList);
+                    consecutiveEmoticons = new LinkedList<>();
                 }
-                consecutivePieces.add(tile);
+                consecutiveEmoticons.add(tile);
                 if (y == yMax - 1) {
-                    examineList(consecutivePieces, bigList);
-                    consecutivePieces = new LinkedList<>();
+                    examineList(consecutiveEmoticons, bigList);
+                    consecutiveEmoticons = new LinkedList<>();
                 }
             }
         }
@@ -68,32 +69,53 @@ public class MatchFinderImpl implements MatchFinder {
         Tile[][] tiles = gameView.getTiles();
         int xMax = gameView.getX_MAX();
         int yMax = gameView.getY_MAX();
-        LinkedList<Tile> consecutiveTiles = new LinkedList<>();
+        LinkedList<Tile> consecutiveEmoticons = new LinkedList<>();
         ArrayList<LinkedList<Tile>> bigList = new ArrayList<>();
         Tile tile;
 
         for (int y = 0; y < yMax; y++) {
-            consecutiveTiles.add(tiles[0][y]);
-
+            consecutiveEmoticons.add(tiles[0][y]);
+            /** combine two if statements into one if statement with an OR to avoid repetition of examineList, etc*/
             for (int x = 1; x < xMax; x++) {
                 tile = tiles[x][y];
-                if (!tile.getEmoticonType().equals(consecutiveTiles.getLast().getEmoticonType())) {
-                    examineList(consecutiveTiles, bigList);
-                    consecutiveTiles = new LinkedList<>();
+                if (!(tile.getEmoticonType().equals(consecutiveEmoticons.getLast().getEmoticonType()))) {
+                    examineList(consecutiveEmoticons, bigList);
+                    consecutiveEmoticons = new LinkedList<>();
                 }
-                consecutiveTiles.add(tile);
+                consecutiveEmoticons.add(tile);
                 if (x == xMax - 1) {
-                    examineList(consecutiveTiles, bigList);
-                    consecutiveTiles = new LinkedList<>();
+                    examineList(consecutiveEmoticons, bigList);
+                    consecutiveEmoticons = new LinkedList<>();
                 }
             }
         }
         return bigList;
     }
 
-    private void examineList(LinkedList<Tile> consecutivePieces, ArrayList<LinkedList<Tile>> bigList) {
-        if (consecutivePieces.size() >= 3) {
-            bigList.add(consecutivePieces);
+    private void examineList(LinkedList<Tile> consecutiveEmotions, ArrayList<LinkedList<Tile>> bigList) {
+        if ((consecutiveEmotions.size() >= 3) && (allSameType(consecutiveEmotions))) {
+            bigList.add(consecutiveEmotions);
         }
+    }
+
+    private boolean allSameType(LinkedList<Tile> consecutiveEmoticons) {
+        String previousEmoticon = consecutiveEmoticons.getFirst().getEmoticonType();
+
+        /** The below if statement only to be used until shiftIconsDown is called in GameView!!!!!!!!!!!!!!!!*/
+        if (previousEmoticon.equals("EMPTY")) return false;
+
+        String nextEmoticon;
+        for (int i = 1; i < consecutiveEmoticons.size(); i++) {
+            nextEmoticon = consecutiveEmoticons.get(i).getEmoticonType();
+            /** The below if statement only to be used until shiftIconsDown is called in GameView!!!!!!!!!!!!!!!!*/
+            if (nextEmoticon.equals("EMPTY")) return false;
+
+            if (!(nextEmoticon.equals(previousEmoticon))) {
+                return false;
+            } else {
+                previousEmoticon = nextEmoticon;
+            }
+        }
+        return true;
     }
 }
