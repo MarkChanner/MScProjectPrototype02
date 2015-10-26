@@ -25,7 +25,7 @@ public class GameActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         /** removed MatchFinderImpl parameter */
-        GameView view = new GameView(this, new BoardPopulatorMock01());
+        GameView view = new GameView(this, new BoardPopulatorImpl());
         setContentView(view);
 
         mediaPlayer = new MediaPlayer();
@@ -35,7 +35,7 @@ public class GameActivity extends Activity {
             mediaPlayer.setDataSource(musicDescriptor.getFileDescriptor(),
                     musicDescriptor.getStartOffset(), musicDescriptor.getLength());
             mediaPlayer.prepare();
-            mediaPlayer.setLooping(false);
+            mediaPlayer.setLooping(true);
         } catch (IOException e) {
             mediaPlayer = null;
         }

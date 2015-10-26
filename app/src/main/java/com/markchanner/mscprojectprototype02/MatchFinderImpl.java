@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class MatchFinderImpl implements MatchFinder {
 
     /**
-     * Starts at column 0, where a tile is added to the List, then proceeds up the column looking
+     * Starts at bottom of column, where a tile is added to the List, then proceeds up the column looking
      * for matches, comparing each tile's emoticon with the one on the tile last visited. Whilst
      * the tile visited has the same type of emoticon as the one on the previous tile, this tile
      * is added to the list. When a tile is reached that has a different type emoticon, or when
@@ -34,15 +34,16 @@ public class MatchFinderImpl implements MatchFinder {
         Tile tile;
 
         for (int x = 0; x < xMax; x++) {
-            consecutiveEmoticons.add(tiles[x][0]);
-            for (int y = 1; y < yMax; y++) {
+            consecutiveEmoticons.add(tiles[x][yMax - 1]);
+
+            for (int y = (yMax - 2); y >= 0; y--) {
                 tile = tiles[x][y];
                 if (!tile.getEmoticonType().equals(consecutiveEmoticons.getLast().getEmoticonType())) {
                     examineList(consecutiveEmoticons, bigList);
                     consecutiveEmoticons = new LinkedList<>();
                 }
                 consecutiveEmoticons.add(tile);
-                if (y == yMax - 1) {
+                if (y == 0) {
                     examineList(consecutiveEmoticons, bigList);
                     consecutiveEmoticons = new LinkedList<>();
                 }
@@ -52,7 +53,7 @@ public class MatchFinderImpl implements MatchFinder {
     }
 
     /**
-     * Starts at the bottom of the board (rowSize - 1), where a tile is added to the List. Then travels across
+     * Starts at the bottom of the board, where a tile is added to the List. Then travels across
      * the row looking for matches, comparing each tile's emoticon with the one on the tile last visited.
      * Whilst the tile visited has the same type of emoticon as the one on the previous tile, this tile
      * is added to the list. When a tile is reached that has a different type emoticon, or when
@@ -72,7 +73,7 @@ public class MatchFinderImpl implements MatchFinder {
         ArrayList<LinkedList<Tile>> bigList = new ArrayList<>();
         Tile tile;
 
-        for (int y = 0; y < yMax; y++) {
+        for (int y = yMax - 1; y >= 0; y--) {
             consecutiveEmoticons.add(tiles[0][y]);
             for (int x = 1; x < xMax; x++) {
                 tile = tiles[x][y];

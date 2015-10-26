@@ -238,16 +238,16 @@ public class GameView extends View {
         removeFromBoard(matchingColumns);
         removeFromBoard(matchingRows);
         shiftIconsDown();
-        //insertNewEmoticons();
-        /*if (matchesFound(matchingColumns, matchingRows)) {
+        insertNewEmoticons();
+        //if (matchesFound(matchingColumns, matchingRows)) {
+        /*do {
             removeFromBoard(matchingColumns);
             removeFromBoard(matchingRows);
-            // shiftIconsDown();
-            // insertNewEmoticons();
+            shiftIconsDown();
+            insertNewEmoticons();
             matchingColumns = matchFinder.findMatchingColumns(this);
             matchingRows = matchFinder.findMatchingRows(this);
-            updateBoard(matchingColumns, matchingRows);
-        }*/
+        } while (matchesFound(matchingColumns, matchingRows));*/
     }
 
     private void removeFromBoard(ArrayList<LinkedList<Tile>> matches) {
@@ -265,21 +265,21 @@ public class GameView extends View {
 
     private void shiftIconsDown() {
         for (int x = 0; x < X_MAX; x++) {
-            for (int y = 0; y < Y_MAX; y++) {
+            for (int y = Y_MAX - 1; y >= 0; y--) {
                 // If empty tile found, mark tile and proceed up column until
                 // gets to end of column or finds a non-empty tile, in which
                 // case this non-empty tile should be moved to the previously
                 // marked tile and then set to empty
                 if (tiles[x][y].getEmoticonType().equals("EMPTY")) {
                     int tempY = y;
-                    while ((tempY < Y_MAX) && (tiles[x][tempY].getEmoticonType().equals("EMPTY"))) {
-                        tempY++;
+                    while ((tempY >= 0) && (tiles[x][tempY].getEmoticonType().equals("EMPTY"))) {
+                        tempY--;
                     }
 
                     // If all tiles to the top of the column are empty, then
-                    // the value of tempY will be equal to Y_MAX, not less,
+                    // the value of tempY will be not be less than 0,
                     // which means there are no icons in the column to shift down
-                    if (tempY < Y_MAX) {
+                    if (tempY >= 0) {
                         Emoticon shiftedEmoticon = tiles[x][tempY].getEmoticon();
                         tiles[x][y].setEmoticon(shiftedEmoticon);
                         Bitmap empty = populator.getEmptyBitmap();
