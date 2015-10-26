@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -30,7 +31,7 @@ public class GameView extends View {
     private Paint gridLineColour;
     private Paint selectionColor;
 
-    int swap = -1;
+    int swapID = -1;
     private int emoticonWidth;
     private int emoticonHeight;
     private final Rect highlightedEmoticon = new Rect();
@@ -53,14 +54,19 @@ public class GameView extends View {
         context = theContext;
         context.getResources();
 
+        // sound file should not exceed 1MB or last over 5 seconds
+        // First parameter defines the max number of sounds effects
+        // can play simultaneously. Final parameter unused to default 0.
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
         try {
+            // For sound effects
             AssetManager assetManager = context.getAssets();
-            AssetFileDescriptor descriptor = assetManager.openFd("swap.ogg");
-            swap = soundPool.load(descriptor, 0);
+            AssetFileDescriptor swapDescriptor = assetManager.openFd("swap.ogg");
+            // Second parameter specifies priority of sound effect
+            swapID = soundPool.load(swapDescriptor, 0);
         } catch (IOException e) {
             // print error message
-            Log.e("Error", "swap sound file failed to load!");
+            Log.e("Error", "swapID sound file failed to load!");
         }
 
         populator = bp;
@@ -124,7 +130,6 @@ public class GameView extends View {
             //Draw  vertical grid lines
             canvas.drawLine(i * emoticonWidth, ZERO, i * emoticonWidth, getHeight(), gridLineColour);
         }
-
         // Draws emoticons
         for (int x = 0; x < X_MAX; x++) {
             for (int y = 0; y < Y_MAX; y++) {
@@ -160,12 +165,6 @@ public class GameView extends View {
         }
     }
 
-    private void highlightTile(int x, int y) {
-        invalidate(highlightedEmoticon);
-        highlightedEmoticon.set(x * emoticonWidth, y * emoticonHeight, x * emoticonWidth + emoticonWidth, y * emoticonHeight + emoticonHeight);
-        invalidate(highlightedEmoticon);
-    }
-
     private void checkValidSelections() {
         deselectTile();
         if (!sameTileSelectedTwice()) {
@@ -179,10 +178,22 @@ public class GameView extends View {
                 userSelection02[X_VAL] = -1;
                 userSelection02[Y_VAL] = -1;
                 highlightTile(userSelection01[X_VAL], userSelection01[Y_VAL]);
+                // Parameters of play method in order: 2nd & 3rd: Left and right volume,
+                // 4th number of times to loop effect (not recommended), 5th: playback
+                // speed. Use SoundPool.unload() to when finished with effect
+                if (swapID != -1) {
+                    soundPool.play(swapID, 1, 1, 0, 0, 1);
+                }
             }
         } else {
             resetUserSelections();
         }
+    }
+
+    private void highlightTile(int x, int y) {
+        invalidate(highlightedEmoticon);
+        highlightedEmoticon.set(x * emoticonWidth, y * emoticonHeight, x * emoticonWidth + emoticonWidth, y * emoticonHeight + emoticonHeight);
+        invalidate(highlightedEmoticon);
     }
 
     private void deselectTile() {
@@ -207,7 +218,7 @@ public class GameView extends View {
     }
 
     private void swapPieces() {
-        soundPool.play(swap, 1, 1, 0, 0, 1);
+        soundPool.play(swapID, 1, 1, 0, 0, 1);
         Emoticon tempEmoticon = tiles[userSelection01[X_VAL]][userSelection01[Y_VAL]].getEmoticon();
         tiles[userSelection01[X_VAL]][userSelection01[Y_VAL]].setEmoticon(tiles[userSelection02[X_VAL]][userSelection02[Y_VAL]].getEmoticon());
         tiles[userSelection02[X_VAL]][userSelection02[Y_VAL]].setEmoticon(tempEmoticon);
@@ -249,7 +260,6 @@ public class GameView extends View {
             for (Tile t : killList) {
                 int x = t.getX();
                 int y = t.getY();
-
                 if (!(tiles[x][y].getEmoticonType().equals("EMPTY"))) {
                     Bitmap empty = populator.getEmptyBitmap();
                     tiles[x][y].setEmoticon(new EmptyEmoticon(empty));
