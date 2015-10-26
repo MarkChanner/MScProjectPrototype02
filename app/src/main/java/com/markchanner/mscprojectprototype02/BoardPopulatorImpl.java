@@ -53,7 +53,7 @@ public class BoardPopulatorImpl implements BoardPopulator {
     }
 
     /**
-     * Returns one of five game piece objects that are chosen at random
+     * Returns one of five emoticons that are chosen at random
      *
      * @return a subclass of AbstractEmoticon (AbstractEmoticon implements Emoticon interface)
      */

@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -59,11 +58,10 @@ public class GameView extends View {
         // can play simultaneously. Final parameter unused to default 0.
         soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
         try {
-            // For sound effects
             AssetManager assetManager = context.getAssets();
-            AssetFileDescriptor swapDescriptor = assetManager.openFd("swap.ogg");
+            AssetFileDescriptor descriptor = assetManager.openFd("swap.ogg");
             // Second parameter specifies priority of sound effect
-            swapID = soundPool.load(swapDescriptor, 0);
+            swapID = soundPool.load(descriptor, 0);
         } catch (IOException e) {
             // print error message
             Log.e("Error", "swapID sound file failed to load!");
@@ -178,12 +176,6 @@ public class GameView extends View {
                 userSelection02[X_VAL] = -1;
                 userSelection02[Y_VAL] = -1;
                 highlightTile(userSelection01[X_VAL], userSelection01[Y_VAL]);
-                // Parameters of play method in order: 2nd & 3rd: Left and right volume,
-                // 4th number of times to loop effect (not recommended), 5th: playback
-                // speed. Use SoundPool.unload() to when finished with effect
-                if (swapID != -1) {
-                    soundPool.play(swapID, 1, 1, 0, 0, 1);
-                }
             }
         } else {
             resetUserSelections();
@@ -243,21 +235,24 @@ public class GameView extends View {
     }
 
     private void updateBoard(ArrayList<LinkedList<Tile>> matchingColumns, ArrayList<LinkedList<Tile>> matchingRows) {
-        if (matchesFound(matchingColumns, matchingRows)) {
+        removeFromBoard(matchingColumns);
+        removeFromBoard(matchingRows);
+        shiftIconsDown();
+        //insertNewEmoticons();
+        /*if (matchesFound(matchingColumns, matchingRows)) {
             removeFromBoard(matchingColumns);
             removeFromBoard(matchingRows);
-            /** May need to check for matches before calling insertNewIcons */
             // shiftIconsDown();
-            // insertNewIcons();
+            // insertNewEmoticons();
             matchingColumns = matchFinder.findMatchingColumns(this);
             matchingRows = matchFinder.findMatchingRows(this);
             updateBoard(matchingColumns, matchingRows);
-        }
+        }*/
     }
 
     private void removeFromBoard(ArrayList<LinkedList<Tile>> matches) {
-        for (List<Tile> killList : matches) {
-            for (Tile t : killList) {
+        for (List<Tile> removeList : matches) {
+            for (Tile t : removeList) {
                 int x = t.getX();
                 int y = t.getY();
                 if (!(tiles[x][y].getEmoticonType().equals("EMPTY"))) {
@@ -271,16 +266,22 @@ public class GameView extends View {
     private void shiftIconsDown() {
         for (int x = 0; x < X_MAX; x++) {
             for (int y = 0; y < Y_MAX; y++) {
+                // If empty tile found, mark tile and proceed up column until
+                // gets to end of column or finds a non-empty tile, in which
+                // case this non-empty tile should be moved to the previously
+                // marked tile and then set to empty
                 if (tiles[x][y].getEmoticonType().equals("EMPTY")) {
-                    // get any pieces higher up the column and, if found, plug hole with it
                     int tempY = y;
                     while ((tempY < Y_MAX) && (tiles[x][tempY].getEmoticonType().equals("EMPTY"))) {
                         tempY++;
                     }
+
+                    // If all tiles to the top of the column are empty, then
+                    // the value of tempY will be equal to Y_MAX, not less,
+                    // which means there are no icons in the column to shift down
                     if (tempY < Y_MAX) {
-                        Emoticon e = tiles[x][tempY].getEmoticon();
-                        tiles[x][y].setEmoticon(e);
-                        /* sets previous tile to be empty */
+                        Emoticon shiftedEmoticon = tiles[x][tempY].getEmoticon();
+                        tiles[x][y].setEmoticon(shiftedEmoticon);
                         Bitmap empty = populator.getEmptyBitmap();
                         tiles[x][tempY].setEmoticon(new EmptyEmoticon(empty));
                     }
@@ -289,9 +290,9 @@ public class GameView extends View {
         }
     }
 
-    private void insertNewIcons() {
+    private void insertNewEmoticons() {
         for (int x = 0; x < X_MAX; x++) {
-            for (int y = 0; y < X_MAX; y++) {
+            for (int y = 0; y < Y_MAX; y++) {
                 if (tiles[x][y].getEmoticonType().equals("EMPTY")) {
                     Emoticon e = populator.generateRandomEmoticon();
                     tiles[x][y].setEmoticon(e);

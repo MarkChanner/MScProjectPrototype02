@@ -66,6 +66,7 @@ public class BoardPopulatorMock01 implements BoardPopulator {
         // Retrieves graphics from drawable, scales down, then assigns to Bitmap object
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.empty_tile);
         emptyBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
+        emptyBitmap.eraseColor(android.graphics.Color.TRANSPARENT);
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.angry);
         angryBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
