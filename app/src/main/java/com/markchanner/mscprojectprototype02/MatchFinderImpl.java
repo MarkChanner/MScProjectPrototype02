@@ -101,14 +101,14 @@ public class MatchFinderImpl implements MatchFinder {
         String previousEmoticon = consecutiveEmoticons.getFirst().getEmoticonType();
 
         /** !!! The below if statement only to be used until shiftIconsDown is called in GameView!!!*/
-        if (previousEmoticon.equals("EMPTY")) return false;
+       // if (previousEmoticon.equals("EMPTY")) return false;
 
         String nextEmoticon;
         for (int i = 1; i < consecutiveEmoticons.size(); i++) {
             nextEmoticon = consecutiveEmoticons.get(i).getEmoticonType();
 
             /** !!! The below if statement only to be used until shiftIconsDown is called in GameView!!!*/
-            if (nextEmoticon.equals("EMPTY")) return false;
+           // if (nextEmoticon.equals("EMPTY")) return false;
 
             if (!(nextEmoticon.equals(previousEmoticon))) {
                 return false;

@@ -235,19 +235,14 @@ public class GameView extends View {
     }
 
     private void updateBoard(ArrayList<LinkedList<Tile>> matchingColumns, ArrayList<LinkedList<Tile>> matchingRows) {
-        removeFromBoard(matchingColumns);
-        removeFromBoard(matchingRows);
-        shiftIconsDown();
-        insertNewEmoticons();
-        //if (matchesFound(matchingColumns, matchingRows)) {
-        /*do {
+        do {
             removeFromBoard(matchingColumns);
             removeFromBoard(matchingRows);
             shiftIconsDown();
             insertNewEmoticons();
             matchingColumns = matchFinder.findMatchingColumns(this);
             matchingRows = matchFinder.findMatchingRows(this);
-        } while (matchesFound(matchingColumns, matchingRows));*/
+        } while (matchesFound(matchingColumns, matchingRows));
     }
 
     private void removeFromBoard(ArrayList<LinkedList<Tile>> matches) {
