@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 
 /**
- * Finds and returns an ArrayList that contains a List/Lists of rows or columns that has a
- * succession of tiles that contain a game piece of the same type.
+ * Finds and returns an ArrayList that contains a List/Lists of rows or columns that have a
+ * succession of tiles that contain an emoticon of the same type.
  *
  * @author Mark Channer for Birkbeck MSc Computer Science project
  */
@@ -13,10 +13,10 @@ public class MatchFinderImpl implements MatchFinder {
 
     /**
      * Starts at column 0, where a tile is added to the List, then proceeds up the column looking
-     * for matches, comparing each tile's game piece with the one on the tile last visited. Whilst
-     * the tile visited has the same type of game piece as the one on the previous tile, this tile
-     * is added to the list. When a tile is reached that has a different type game piece, or when
-     * the end of each column is reached, the List is checked. If the List contains 3 or more game pieces,
+     * for matches, comparing each tile's emoticon with the one on the tile last visited. Whilst
+     * the tile visited has the same type of emoticon as the one on the previous tile, this tile
+     * is added to the list. When a tile is reached that has a different type emoticon, or when
+     * the end of each column is reached, the List is checked. If the List contains 3 or more emoticons,
      * this List is added to the ArrayList, which is returned after the entire board has been checked.
      *
      * @param gameView the board to be checked for matching columns
@@ -35,7 +35,6 @@ public class MatchFinderImpl implements MatchFinder {
 
         for (int x = 0; x < xMax; x++) {
             consecutiveEmoticons.add(tiles[x][0]);
-            /** combine two if statemens into on if statement with an OR to avoid repetition of examineList, etc*/
             for (int y = 1; y < yMax; y++) {
                 tile = tiles[x][y];
                 if (!tile.getEmoticonType().equals(consecutiveEmoticons.getLast().getEmoticonType())) {
@@ -54,10 +53,10 @@ public class MatchFinderImpl implements MatchFinder {
 
     /**
      * Starts at the bottom of the board (rowSize - 1), where a tile is added to the List. Then travels across
-     * the row looking for matches, comparing each tile's game piece with the one on the tile last visited.
-     * Whilst the tile visited has the same type of game piece as the one on the previous tile, this tile
-     * is added to the list. When a tile is reached that has a different type game piece, or when
-     * the end of each row is reached, the List is checked. If the List contains 3 or more game pieces,
+     * the row looking for matches, comparing each tile's emoticon with the one on the tile last visited.
+     * Whilst the tile visited has the same type of emoticon as the one on the previous tile, this tile
+     * is added to the list. When a tile is reached that has a different type emoticon, or when
+     * the end of each row is reached, the List is checked. If the List contains 3 or more emoticons,
      * this List is added to the ArrayList, which is returned after the entire board has been checked.
      *
      * @param gameView the board to be checked for matching rows
@@ -75,7 +74,6 @@ public class MatchFinderImpl implements MatchFinder {
 
         for (int y = 0; y < yMax; y++) {
             consecutiveEmoticons.add(tiles[0][y]);
-            /** combine two if statements into one if statement with an OR to avoid repetition of examineList, etc*/
             for (int x = 1; x < xMax; x++) {
                 tile = tiles[x][y];
                 if (!(tile.getEmoticonType().equals(consecutiveEmoticons.getLast().getEmoticonType()))) {
@@ -101,13 +99,14 @@ public class MatchFinderImpl implements MatchFinder {
     private boolean allSameType(LinkedList<Tile> consecutiveEmoticons) {
         String previousEmoticon = consecutiveEmoticons.getFirst().getEmoticonType();
 
-        /** The below if statement only to be used until shiftIconsDown is called in GameView!!!!!!!!!!!!!!!!*/
+        /** !!! The below if statement only to be used until shiftIconsDown is called in GameView!!!*/
         if (previousEmoticon.equals("EMPTY")) return false;
 
         String nextEmoticon;
         for (int i = 1; i < consecutiveEmoticons.size(); i++) {
             nextEmoticon = consecutiveEmoticons.get(i).getEmoticonType();
-            /** The below if statement only to be used until shiftIconsDown is called in GameView!!!!!!!!!!!!!!!!*/
+
+            /** !!! The below if statement only to be used until shiftIconsDown is called in GameView!!!*/
             if (nextEmoticon.equals("EMPTY")) return false;
 
             if (!(nextEmoticon.equals(previousEmoticon))) {

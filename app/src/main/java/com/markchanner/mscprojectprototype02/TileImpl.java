@@ -18,12 +18,6 @@ public class TileImpl implements Tile {
         emoticon.setCoordinates(this.x, this.y);
     }
 
-    public TileImpl(int x, int y) {
-        this.x = x;
-        this.y = y;
-        emoticon = null;
-    }
-
     /**
      * {@inheritDoc}
      */

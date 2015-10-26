@@ -1,33 +1,36 @@
 package com.markchanner.mscprojectprototype02;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.media.AudioManager;
+import android.media.SoundPool;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * LIST OF CHANGES REGARDING PROBLEM WITH GRID:
- * 1. SET COLUMN AND ROW TO DIFFERENT SIZE SO CAN TELL IF SOMETHING WRONG
- * 2. onSizeChanged() method: emoticonWidth = screenWidth / X_MAX; - This makes more sense
- * 3. onDraw() method: Check all these values very carefully
- * 4. DECIDED TO CHANGE EVERYTHING TO X, Y - IT WILL AVOID CONFUSION
- *
  * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public class GameView extends View {
 
     private Context context;
+    private SoundPool soundPool;
     private Paint backgroundColour;
     private Paint gridLineColour;
     private Paint selectionColor;
+
+    int swap = -1;
     private int emoticonWidth;
     private int emoticonHeight;
     private final Rect highlightedEmoticon = new Rect();
@@ -49,6 +52,17 @@ public class GameView extends View {
         super(theContext);
         context = theContext;
         context.getResources();
+
+        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
+        try {
+            AssetManager assetManager = context.getAssets();
+            AssetFileDescriptor descriptor = assetManager.openFd("swap.ogg");
+            swap = soundPool.load(descriptor, 0);
+        } catch (IOException e) {
+            // print error message
+            Log.e("Error", "swap sound file failed to load!");
+        }
+
         populator = bp;
         matchFinder = new MatchFinderImpl();
 
@@ -76,7 +90,6 @@ public class GameView extends View {
     }
 
     private void resetUserSelections() {
-        /** maybe call invalidate() on current selections */
         firstSelectionMade = false;
         userSelection01[X_VAL] = -1;
         userSelection01[Y_VAL] = -1;
@@ -100,7 +113,7 @@ public class GameView extends View {
         canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
 
         // Highlights a selected  tile
-        selectionColor.setColor(Color.parseColor("#50ff8000"));
+        selectionColor.setColor(Color.parseColor("#fff2a8"));
         canvas.drawRect(highlightedEmoticon, selectionColor);
 
         gridLineColour.setStrokeWidth(2f);
@@ -136,14 +149,13 @@ public class GameView extends View {
 
     public void selectTile(int x, int y) {
         if (!(firstSelectionMade)) {
-            highlightTile(x,y);
             userSelection01[X_VAL] = x;
             userSelection01[Y_VAL] = y;
+            highlightTile(userSelection01[X_VAL], userSelection01[Y_VAL]);
             firstSelectionMade = true;
         } else {
             userSelection02[X_VAL] = x;
             userSelection02[Y_VAL] = y;
-            highlightTile(x,y);
             checkValidSelections();
         }
     }
@@ -155,6 +167,7 @@ public class GameView extends View {
     }
 
     private void checkValidSelections() {
+        deselectTile();
         if (!sameTileSelectedTwice()) {
             if (selectedTilesAreAdjacent()) {
                 swapPieces();
@@ -165,10 +178,17 @@ public class GameView extends View {
                 userSelection01[Y_VAL] = userSelection02[Y_VAL];
                 userSelection02[X_VAL] = -1;
                 userSelection02[Y_VAL] = -1;
+                highlightTile(userSelection01[X_VAL], userSelection01[Y_VAL]);
             }
         } else {
             resetUserSelections();
         }
+    }
+
+    private void deselectTile() {
+        invalidate(highlightedEmoticon);
+        highlightedEmoticon.setEmpty();
+        invalidate(highlightedEmoticon);
     }
 
     private boolean sameTileSelectedTwice() {
@@ -187,6 +207,7 @@ public class GameView extends View {
     }
 
     private void swapPieces() {
+        soundPool.play(swap, 1, 1, 0, 0, 1);
         Emoticon tempEmoticon = tiles[userSelection01[X_VAL]][userSelection01[Y_VAL]].getEmoticon();
         tiles[userSelection01[X_VAL]][userSelection01[Y_VAL]].setEmoticon(tiles[userSelection02[X_VAL]][userSelection02[Y_VAL]].getEmoticon());
         tiles[userSelection02[X_VAL]][userSelection02[Y_VAL]].setEmoticon(tempEmoticon);
@@ -210,20 +231,17 @@ public class GameView extends View {
         swapPieces();
     }
 
-    /**
-     * update variable names and method logic!
-     */
     private void updateBoard(ArrayList<LinkedList<Tile>> matchingColumns, ArrayList<LinkedList<Tile>> matchingRows) {
-        removeFromBoard(matchingColumns);
-        removeFromBoard(matchingRows);
-        /*do {
+        if (matchesFound(matchingColumns, matchingRows)) {
             removeFromBoard(matchingColumns);
             removeFromBoard(matchingRows);
-            shiftIconsDown();
-            insertNewIcons();
+            /** May need to check for matches before calling insertNewIcons */
+            // shiftIconsDown();
+            // insertNewIcons();
             matchingColumns = matchFinder.findMatchingColumns(this);
             matchingRows = matchFinder.findMatchingRows(this);
-        } while (matchesFound(matchingColumns, matchingRows));*/
+            updateBoard(matchingColumns, matchingRows);
+        }
     }
 
     private void removeFromBoard(ArrayList<LinkedList<Tile>> matches) {
@@ -263,7 +281,7 @@ public class GameView extends View {
 
     private void insertNewIcons() {
         for (int x = 0; x < X_MAX; x++) {
-            for (int y = 0; y < Y_MAX; y++) {
+            for (int y = 0; y < X_MAX; y++) {
                 if (tiles[x][y].getEmoticonType().equals("EMPTY")) {
                     Emoticon e = populator.generateRandomEmoticon();
                     tiles[x][y].setEmoticon(e);
