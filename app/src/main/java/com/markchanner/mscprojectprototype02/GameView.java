@@ -13,6 +13,7 @@ import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -34,21 +35,17 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
     //Thread gameThread = null;
 
     int swapID = -1;
-    private int emoticonWidth;
-    private int emoticonHeight;
+    private int emoWidth;
+    private int emoHeight;
     private final Rect highlightedEmoticon = new Rect();
-
-
-    private static final int X_VAL = 0;
-    private static final int Y_VAL = 1;
 
     private final int X_MAX = 8;
     private final int Y_MAX = 7;
     private MatchFinder matchFinder;
     private BoardPopulator populator;
     private Emoticon[][] emoticonArray;
-    private int[] selection1 = new int[2];
-    private int[] selection2 = new int[2];
+    private int[] select1 = new int[2];
+    private int[] select2 = new int[2];
     private boolean firstSelectionMade;
 
     public GameView(Context theContext, BoardPopulator bp) {
@@ -98,18 +95,18 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
 
     private void resetUserSelections() {
         firstSelectionMade = false;
-        selection1[X_VAL] = -1;
-        selection1[Y_VAL] = -1;
-        selection2[X_VAL] = -1;
-        selection2[Y_VAL] = -1;
+        select1[0] = -1;
+        select1[1] = -1;
+        select2[0] = -1;
+        select2[1] = -1;
     }
 
     @Override
     protected void onSizeChanged(int screenWidth, int screenHeight, int oldWidth, int oldHeight) {
         super.onSizeChanged(screenWidth, screenHeight, oldWidth, oldHeight);
-        emoticonWidth = screenWidth / X_MAX;
-        emoticonHeight = screenHeight / Y_MAX;
-        populator.populate(this, context, emoticonWidth, emoticonHeight);
+        emoWidth = screenWidth / X_MAX;
+        emoHeight = screenHeight / Y_MAX;
+        populator.populate(this, context, emoWidth, emoHeight);
     }
 
     @Override
@@ -131,15 +128,15 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
         gridLineColour.setColor(Color.BLACK);
         for (int i = 0; i < X_MAX; i++) {
             // Draws  horizontal grid lines
-            canvas.drawLine(ZERO, i * emoticonHeight, getWidth(), i * emoticonHeight, gridLineColour);
+            canvas.drawLine(ZERO, i * emoHeight, getWidth(), i * emoHeight, gridLineColour);
             //Draw  vertical grid lines
-            canvas.drawLine(i * emoticonWidth, ZERO, i * emoticonWidth, getHeight(), gridLineColour);
+            canvas.drawLine(i * emoWidth, ZERO, i * emoWidth, getHeight(), gridLineColour);
         }
         // Draws emoticons
         for (int x = 0; x < X_MAX; x++) {
             for (int y = 0; y < Y_MAX; y++) {
                 Emoticon e = emoticonArray[x][y];
-                canvas.drawBitmap(e.getBitmap(), x * emoticonWidth, y * emoticonHeight, null);
+                canvas.drawBitmap(e.getBitmap(), x * emoWidth, y * emoHeight, null);
             }
         }
         //holder.unlockCanvasAndPost(canvas);
@@ -164,15 +161,15 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
             gridLineColour.setColor(Color.BLACK);
             for (int i = 0; i < X_MAX; i++) {
                 // Draws  horizontal grid lines
-                canvas.drawLine(ZERO, i * emoticonHeight, getWidth(), i * emoticonHeight, gridLineColour);
+                canvas.drawLine(ZERO, i * emoHeight, getWidth(), i * emoHeight, gridLineColour);
                 //Draw  vertical grid lines
-                canvas.drawLine(i * emoticonWidth, ZERO, i * emoticonWidth, getHeight(), gridLineColour);
+                canvas.drawLine(i * emoWidth, ZERO, i * emoWidth, getHeight(), gridLineColour);
             }
             // Draws emoticons
             for (int x = 0; x < X_MAX; x++) {
                 for (int y = 0; y < Y_MAX; y++) {
                     Emoticon e = emoticonArray[x][y].getEmoticon();
-                    canvas.drawBitmap(e.getBitmap(), x * emoticonWidth, y * emoticonHeight, null);
+                    canvas.drawBitmap(e.getBitmap(), x * emoWidth, y * emoHeight, null);
                 }
             }
             holder.unlockCanvasAndPost(canvas);
@@ -185,7 +182,7 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
         int y = (int) event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                selectEmoticon(x / emoticonWidth, y / emoticonHeight);
+                selectEmoticon(x / emoWidth, y / emoHeight);
                 break;
         }
         //invalidate();
@@ -194,13 +191,13 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
 
     public void selectEmoticon(int x, int y) {
         if (!(firstSelectionMade)) {
-            selection1[X_VAL] = x;
-            selection1[Y_VAL] = y;
-            highlightEmoticon(selection1[X_VAL], selection1[Y_VAL]);
+            select1[0] = x;
+            select1[1] = y;
+            highlightEmoticon(select1[0], select1[1]);
             firstSelectionMade = true;
         } else {
-            selection2[X_VAL] = x;
-            selection2[Y_VAL] = y;
+            select2[0] = x;
+            select2[1] = y;
             checkValidSelections();
         }
     }
@@ -213,11 +210,11 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
                 findMatches();
                 resetUserSelections();
             } else {
-                selection1[X_VAL] = selection2[X_VAL];
-                selection1[Y_VAL] = selection2[Y_VAL];
-                selection2[X_VAL] = -1;
-                selection2[Y_VAL] = -1;
-                highlightEmoticon(selection1[X_VAL], selection1[Y_VAL]);
+                select1[0] = select2[0];
+                select1[1] = select2[1];
+                select2[0] = -1;
+                select2[1] = -1;
+                highlightEmoticon(select1[0], select1[1]);
             }
         } else {
             resetUserSelections();
@@ -226,7 +223,7 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
 
     private void highlightEmoticon(int x, int y) {
         invalidate(highlightedEmoticon);
-        highlightedEmoticon.set(x * emoticonWidth, y * emoticonHeight, x * emoticonWidth + emoticonWidth, y * emoticonHeight + emoticonHeight);
+        highlightedEmoticon.set(x * emoWidth, y * emoHeight, x * emoWidth + emoWidth, y * emoHeight + emoHeight);
         invalidate(highlightedEmoticon);
     }
 
@@ -237,15 +234,15 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
     }
 
     private boolean sameSquareSelectedTwice() {
-        return ((selection1[X_VAL] == selection2[X_VAL]) && (selection1[Y_VAL] == selection2[Y_VAL]));
+        return ((select1[0] == select2[0]) && (select1[1] == select2[1]));
     }
 
     private boolean selectedEmoticonsAreAdjacent() {
-        if ((selection1[X_VAL] == selection2[X_VAL]) &&
-                (selection1[Y_VAL] == (selection2[Y_VAL] + 1) || selection1[Y_VAL] == (selection2[Y_VAL] - 1))) {
+        if ((select1[0] == select2[0]) &&
+                (select1[1] == (select2[1] + 1) || select1[1] == (select2[1] - 1))) {
             return true;
-        } else if ((selection1[Y_VAL] == selection2[Y_VAL]) &&
-                (selection1[X_VAL] == (selection2[X_VAL] + 1) || selection1[X_VAL] == (selection2[X_VAL] - 1))) {
+        } else if ((select1[1] == select2[1]) &&
+                (select1[0] == (select2[0] + 1) || select1[0] == (select2[0] - 1))) {
             return true;
         }
         return false;
@@ -253,17 +250,17 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
 
     private void swapPieces() {
         soundPool.play(swapID, 1, 1, 0, 0, 1);
-        Emoticon tempEmoticon1 = emoticonArray[selection1[X_VAL]][selection1[Y_VAL]];
+        Emoticon tempEmoticon1 = emoticonArray[select1[0]][select1[1]];
         int tempX = tempEmoticon1.getX();
         int tempY = tempEmoticon1.getY();
 
-        emoticonArray[selection1[X_VAL]][selection1[Y_VAL]].setX(emoticonArray[selection2[X_VAL]][selection2[Y_VAL]].getX());
-        emoticonArray[selection1[X_VAL]][selection1[Y_VAL]].setY(emoticonArray[selection2[X_VAL]][selection2[Y_VAL]].getY());
-        emoticonArray[selection1[X_VAL]][selection1[Y_VAL]] = emoticonArray[selection2[X_VAL]][selection2[Y_VAL]];
+        emoticonArray[select1[0]][select1[1]].setX(emoticonArray[select2[0]][select2[1]].getX());
+        emoticonArray[select1[0]][select1[1]].setY(emoticonArray[select2[0]][select2[1]].getY());
+        emoticonArray[select1[0]][select1[1]] = emoticonArray[select2[0]][select2[0]];
 
-        emoticonArray[selection2[X_VAL]][selection2[Y_VAL]].setX(tempX);
-        emoticonArray[selection2[X_VAL]][selection2[Y_VAL]].setY(tempY);
-        emoticonArray[selection2[X_VAL]][selection2[Y_VAL]] = tempEmoticon1;
+        emoticonArray[select2[0]][select2[1]].setX(tempX);
+        emoticonArray[select2[0]][select2[1]].setY(tempY);
+        emoticonArray[select2[0]][select2[1]] = tempEmoticon1;
     }
 
     private void findMatches() {
