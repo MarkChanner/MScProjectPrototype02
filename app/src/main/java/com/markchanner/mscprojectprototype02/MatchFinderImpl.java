@@ -4,18 +4,18 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 
 /**
- * Finds and returns an ArrayList that contains a List/Lists of rows or columns that have a
- * succession of tiles that contain an emoticon of the same type.
+ * Finds and returns an ArrayList that contains a List/Lists of rows or
+ * columns that have a succession emoticons of the same type.
  *
  * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public class MatchFinderImpl implements MatchFinder {
 
     /**
-     * Starts at bottom of column, where a tile is added to the List, then proceeds up the column looking
-     * for matches, comparing each tile's emoticon with the one on the tile last visited. Whilst
-     * the tile visited has the same type of emoticon as the one on the previous tile, this tile
-     * is added to the list. When a tile is reached that has a different type emoticon, or when
+     * Starts at bottom of column, where an emoticon is added to the List, then proceeds up the
+     * column looking for matches, comparing each emoticon with the one last visited. Whilst
+     * the emoticon is of the same type as the previous one, this emoticon
+     * is added to the list. When an emoticon is reached that is of a different type, or when
      * the end of each column is reached, the List is checked. If the List contains 3 or more emoticons,
      * this List is added to the ArrayList, which is returned after the entire board has been checked.
      *
@@ -24,25 +24,25 @@ public class MatchFinderImpl implements MatchFinder {
      * if no matching rows are located on the board
      */
     @Override
-    public ArrayList<LinkedList<Tile>> findMatchingColumns(GameView gameView) {
-        Tile[][] tiles = gameView.getTiles();
+    public ArrayList<LinkedList<Emoticon>> findMatchingColumns(GameView gameView) {
+        Emoticon[][] emoticonArray = gameView.getEmoticonArray();
         int xMax = gameView.getX_MAX();
         int yMax = gameView.getY_MAX();
 
-        LinkedList<Tile> consecutiveEmoticons = new LinkedList<>();
-        ArrayList<LinkedList<Tile>> bigList = new ArrayList<>();
-        Tile tile;
+        LinkedList<Emoticon> consecutiveEmoticons = new LinkedList<>();
+        ArrayList<LinkedList<Emoticon>> bigList = new ArrayList<>();
+        Emoticon emoticon;
 
         for (int x = 0; x < xMax; x++) {
-            consecutiveEmoticons.add(tiles[x][yMax - 1]);
+            consecutiveEmoticons.add(emoticonArray[x][yMax - 1]);
 
             for (int y = (yMax - 2); y >= 0; y--) {
-                tile = tiles[x][y];
-                if (!tile.getEmoticonType().equals(consecutiveEmoticons.getLast().getEmoticonType())) {
+                emoticon = emoticonArray[x][y];
+                if (!emoticon.getType().equals(consecutiveEmoticons.getLast().getType())) {
                     examineList(consecutiveEmoticons, bigList);
                     consecutiveEmoticons = new LinkedList<>();
                 }
-                consecutiveEmoticons.add(tile);
+                consecutiveEmoticons.add(emoticon);
                 if (y == 0) {
                     examineList(consecutiveEmoticons, bigList);
                     consecutiveEmoticons = new LinkedList<>();
@@ -53,10 +53,10 @@ public class MatchFinderImpl implements MatchFinder {
     }
 
     /**
-     * Starts at the bottom of the board, where a tile is added to the List. Then travels across
-     * the row looking for matches, comparing each tile's emoticon with the one on the tile last visited.
-     * Whilst the tile visited has the same type of emoticon as the one on the previous tile, this tile
-     * is added to the list. When a tile is reached that has a different type emoticon, or when
+     * Starts at the bottom of the board, where an emoticon is added to the List. Then travels across
+     * the row looking for matches, comparing each emoticon with the one last visited.
+     * Whilst the emoticon visited is of the same type as the one on the previous one, this emoticon
+     * is added to the list. When an emoticon is reached that is of a different type, or when
      * the end of each row is reached, the List is checked. If the List contains 3 or more emoticons,
      * this List is added to the ArrayList, which is returned after the entire board has been checked.
      *
@@ -65,23 +65,23 @@ public class MatchFinderImpl implements MatchFinder {
      * if no matching rows are located on the board
      */
     @Override
-    public ArrayList<LinkedList<Tile>> findMatchingRows(GameView gameView) {
-        Tile[][] tiles = gameView.getTiles();
+    public ArrayList<LinkedList<Emoticon>> findMatchingRows(GameView gameView) {
+        Emoticon[][] emoticonArray = gameView.getEmoticonArray();
         int xMax = gameView.getX_MAX();
         int yMax = gameView.getY_MAX();
-        LinkedList<Tile> consecutiveEmoticons = new LinkedList<>();
-        ArrayList<LinkedList<Tile>> bigList = new ArrayList<>();
-        Tile tile;
+        LinkedList<Emoticon> consecutiveEmoticons = new LinkedList<>();
+        ArrayList<LinkedList<Emoticon>> bigList = new ArrayList<>();
+        Emoticon emoticon;
 
         for (int y = yMax - 1; y >= 0; y--) {
-            consecutiveEmoticons.add(tiles[0][y]);
+            consecutiveEmoticons.add(emoticonArray[0][y]);
             for (int x = 1; x < xMax; x++) {
-                tile = tiles[x][y];
-                if (!(tile.getEmoticonType().equals(consecutiveEmoticons.getLast().getEmoticonType()))) {
+                emoticon = emoticonArray[x][y];
+                if (!(emoticon.getType().equals(consecutiveEmoticons.getLast().getType()))) {
                     examineList(consecutiveEmoticons, bigList);
                     consecutiveEmoticons = new LinkedList<>();
                 }
-                consecutiveEmoticons.add(tile);
+                consecutiveEmoticons.add(emoticon);
                 if (x == xMax - 1) {
                     examineList(consecutiveEmoticons, bigList);
                     consecutiveEmoticons = new LinkedList<>();
@@ -91,25 +91,17 @@ public class MatchFinderImpl implements MatchFinder {
         return bigList;
     }
 
-    private void examineList(LinkedList<Tile> consecutiveEmotions, ArrayList<LinkedList<Tile>> bigList) {
+    private void examineList(LinkedList<Emoticon> consecutiveEmotions, ArrayList<LinkedList<Emoticon>> bigList) {
         if ((consecutiveEmotions.size() >= 3) && (allSameType(consecutiveEmotions))) {
             bigList.add(consecutiveEmotions);
         }
     }
 
-    private boolean allSameType(LinkedList<Tile> consecutiveEmoticons) {
-        String previousEmoticon = consecutiveEmoticons.getFirst().getEmoticonType();
-
-        /** !!! The below if statement only to be used until shiftIconsDown is called in GameView!!!*/
-       // if (previousEmoticon.equals("EMPTY")) return false;
-
+    private boolean allSameType(LinkedList<Emoticon> consecutiveEmoticons) {
+        String previousEmoticon = consecutiveEmoticons.getFirst().getType();
         String nextEmoticon;
         for (int i = 1; i < consecutiveEmoticons.size(); i++) {
-            nextEmoticon = consecutiveEmoticons.get(i).getEmoticonType();
-
-            /** !!! The below if statement only to be used until shiftIconsDown is called in GameView!!!*/
-           // if (nextEmoticon.equals("EMPTY")) return false;
-
+            nextEmoticon = consecutiveEmoticons.get(i).getType();
             if (!(nextEmoticon.equals(previousEmoticon))) {
                 return false;
             } else {

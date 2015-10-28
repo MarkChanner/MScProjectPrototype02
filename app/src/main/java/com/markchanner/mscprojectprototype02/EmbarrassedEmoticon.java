@@ -7,18 +7,11 @@ import android.graphics.Bitmap;
  */
 public class EmbarrassedEmoticon extends AbstractEmoticon {
 
-    public EmbarrassedEmoticon(Bitmap b) {
-        super (b, "EMBARRASSED");
-    }
+    public static final String EMOTION_TYPE = "EMBARRASSED";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Emoticon retrieveEmoticon() {
-        return (this);
+    public EmbarrassedEmoticon(int x, int y, Bitmap embarrassedBitmap) {
+        super (x, y, embarrassedBitmap, EMOTION_TYPE);
     }
-
 }
 
 

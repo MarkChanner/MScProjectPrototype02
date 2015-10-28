@@ -3,7 +3,6 @@ package com.markchanner.mscprojectprototype02;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
 import java.util.Random;
 
 /**
@@ -24,9 +23,9 @@ public class BoardPopulatorImpl implements BoardPopulator {
     private Bitmap emptyBitmap;
 
     /**
-     * Populates the given Board object with game pieces that are allocated at random. If
-     * placing the game piece would result in a board that has 3 consecutive piece types at
-     * the start of the game, another game piece is chosen until one that does not form a match is
+     * Populates the given Board object with emoticons that are allocated at random. If
+     * placing the emoticon would result in a board that has 3 consecutive emoticons at
+     * the start of the game, another emoticon is chosen until one that does not form a match is
      * found { @inheritDocs }
      */
     @Override
@@ -34,20 +33,20 @@ public class BoardPopulatorImpl implements BoardPopulator {
         createBitmaps(context, emoticonWidth, emoticonHeight);
         int maxX = view.getX_MAX();
         int maxY = view.getY_MAX();
-        Tile[][] tiles = view.getTiles();
+        Emoticon[][] emoticonArray = view.getEmoticonArray();
         Emoticon newEmoticon;
         for (int x = 0; x < maxX; x++) {
             for (int y = 0; y < maxY; y++) {
                 do {
-                    newEmoticon = generateRandomEmoticon();
+                    newEmoticon = generateRandomEmoticon(x, y);
                 } while ((y >= 2 &&
-                        (newEmoticon.showType().equals(tiles[x][y - 1].getEmoticonType()) &&
-                                newEmoticon.showType().equals(tiles[x][y - 2].getEmoticonType()))) ||
+                        (newEmoticon.getType().equals(emoticonArray[x][y - 1].getType()) &&
+                                newEmoticon.getType().equals(emoticonArray[x][y - 2].getType()))) ||
                         (x >= 2 &&
-                                (newEmoticon.showType().equals(tiles[x - 1][y].getEmoticonType()) &&
-                                        newEmoticon.showType().equals(tiles[x - 2][y].getEmoticonType()))));
+                                (newEmoticon.getType().equals(emoticonArray[x - 1][y].getType()) &&
+                                        newEmoticon.getType().equals(emoticonArray[x - 2][y].getType()))));
 
-                tiles[x][y] = new TileImpl(x, y, newEmoticon);
+                emoticonArray[x][y] = newEmoticon;
             }
         }
     }
@@ -57,6 +56,33 @@ public class BoardPopulatorImpl implements BoardPopulator {
      *
      * @return a subclass of AbstractEmoticon (AbstractEmoticon implements Emoticon interface)
      */
+    @Override
+    public Emoticon generateRandomEmoticon(int x, int y) {
+        Emoticon emoticon = null;
+        Random random = new Random();
+        int value = random.nextInt(5);
+        switch (value) {
+            case 0:
+                emoticon = new AngryEmoticon(x, y, angryBitmap);
+                break;
+            case 1:
+                emoticon = new DelightedEmoticon(x, y, delightedBitmap);
+                break;
+            case 2:
+                emoticon = new EmbarrassedEmoticon(x, y, embarrassedBitmap);
+                break;
+            case 3:
+                emoticon = new SurprisedEmoticon(x, y, surprisedBitmap);
+                break;
+            case 4:
+                emoticon = new UpsetEmoticon(x, y, upsetBitmap);
+                break;
+            default:
+                break;
+        }
+        return emoticon;
+    }
+
     @Override
     public void createBitmaps(Context context, int emoticonWidth, int emoticonHeight) {
 
@@ -80,37 +106,9 @@ public class BoardPopulatorImpl implements BoardPopulator {
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.upset);
         upsetBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
-
     }
 
-
-    // Generates an emoticon at random and assigns row and column ID
-    public Emoticon generateRandomEmoticon() {
-        Emoticon emoticon = null;
-        Random random = new Random();
-        int value = random.nextInt(5);
-        switch (value) {
-            case 0:
-                emoticon = new AngryEmoticon(angryBitmap);
-                break;
-            case 1:
-                emoticon = new DelightedEmoticon(delightedBitmap);
-                break;
-            case 2:
-                emoticon = new EmbarrassedEmoticon(embarrassedBitmap);
-                break;
-            case 3:
-                emoticon = new SurprisedEmoticon(surprisedBitmap);
-                break;
-            case 4:
-                emoticon = new UpsetEmoticon(upsetBitmap);
-                break;
-            default:
-                break;
-        }
-        return emoticon;
-    }
-
+    @Override
     public Bitmap getEmptyBitmap() {
         return emptyBitmap;
     }

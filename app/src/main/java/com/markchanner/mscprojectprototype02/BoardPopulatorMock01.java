@@ -26,37 +26,38 @@ public class BoardPopulatorMock01 implements BoardPopulator {
         createBitmaps(context, emoticonWidth, emoticonHeight);
         int maxX = view.getX_MAX();
         int maxY = view.getY_MAX();
-        Tile[][] tiles = view.getTiles();
+        Emoticon[][] tiles = view.getEmoticonArray();
         int counter = 0;
         for (int x = 0; x < maxX; x++) {
             for (int y = 0; y < maxY; y++) {
                 if (tiles[x][y] == null) {
                     String str = counter <= 9 ? "0" + counter : "" + counter;
-                    tiles[x][y] = new TileImpl(x, y, new MockEmoticon(emptyBitmap, str));
+                    /**BELOW WAS: tiles[x][y] = new TileImpl(x, y, new MockEmoticon(emptyBitmap, str));*/
+                    tiles[x][y] = new MockEmoticon(x, y, emptyBitmap, str);
                     counter++;
                 }
             }
         }
 
-        // Sets up tiles so that a match of HappyEmoticons in a row
+        // Sets up emoticons so that a match of HappyEmoticons in a row
         // and a match of EmbarrassedEmoticons in a column can occur
         // when tiles 0,3 and 0,4 are selected
-        tiles[0][1] = new TileImpl(0, 1, new SurprisedEmoticon(surprisedBitmap));
-        tiles[0][2] = new TileImpl(0, 2, new SurprisedEmoticon(surprisedBitmap));
-        tiles[0][3] = new TileImpl(0, 3, new EmbarrassedEmoticon(embarrassedBitmap));
-        tiles[0][4] = new TileImpl(0, 4, new SurprisedEmoticon(surprisedBitmap));
-        tiles[1][4] = new TileImpl(1, 4, new EmbarrassedEmoticon(embarrassedBitmap));
-        tiles[2][4] = new TileImpl(2, 4, new EmbarrassedEmoticon(embarrassedBitmap));
+        tiles[0][1] = new SurprisedEmoticon(0, 1, surprisedBitmap);
+        tiles[0][2] = new SurprisedEmoticon(0, 2, surprisedBitmap);
+        tiles[0][3] = new EmbarrassedEmoticon(0, 3, embarrassedBitmap);
+        tiles[0][4] = new SurprisedEmoticon(0, 4, surprisedBitmap);
+        tiles[1][4] = new EmbarrassedEmoticon(1, 4, embarrassedBitmap);
+        tiles[2][4] = new EmbarrassedEmoticon(2, 4, embarrassedBitmap);
 
         // Sets up tiles so that a match of AngryEmoticons in a row
         // and a match of UpsetEmoticons in a column can occur when
         // tiles at locations (3,3) and (4,3) are selected
-        tiles[3][3] = new TileImpl(3, 3, new UpsetEmoticon(upsetBitmap));
-        tiles[4][3] = new TileImpl(4, 3, new AngryEmoticon(angryBitmap));
-        tiles[5][3] = new TileImpl(5, 3, new UpsetEmoticon(upsetBitmap));
-        tiles[6][3] = new TileImpl(6, 3, new UpsetEmoticon(upsetBitmap));
-        tiles[4][4] = new TileImpl(4, 4, new UpsetEmoticon(upsetBitmap));
-        tiles[4][5] = new TileImpl(4, 5, new UpsetEmoticon(upsetBitmap));
+        tiles[3][3] = new UpsetEmoticon(3, 3, upsetBitmap);
+        tiles[4][3] = new AngryEmoticon(4, 3, angryBitmap);
+        tiles[5][3] = new UpsetEmoticon(5, 3, upsetBitmap);
+        tiles[6][3] = new UpsetEmoticon(6, 3, upsetBitmap);
+        tiles[4][4] = new UpsetEmoticon(4, 4, upsetBitmap);
+        tiles[4][5] = new UpsetEmoticon(4, 5, upsetBitmap);
     }
 
     @Override
@@ -89,9 +90,11 @@ public class BoardPopulatorMock01 implements BoardPopulator {
         return emptyBitmap;
     }
 
-    /** This method is currently not in use */
+    /**
+     * This method is currently not in use
+     */
     @Override
-    public Emoticon generateRandomEmoticon() {
-       return new EmptyEmoticon(emptyBitmap);
+    public Emoticon generateRandomEmoticon(int x, int y) {
+        return new EmptyEmoticon(x, y, emptyBitmap);
     }
 }

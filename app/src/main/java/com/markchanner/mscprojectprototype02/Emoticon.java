@@ -3,44 +3,22 @@ package com.markchanner.mscprojectprototype02;
 import android.graphics.Bitmap;
 
 /**
- * A game piece, such as an emoticon for a tile matching game.
- *
  * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public interface Emoticon {
 
-    /**
-     *
-     * @return Bitmap the bitmap representing the emotion
-     */
+    int getX();
+
+    void setX(int x);
+
+    int getY();
+
+    void setY(int y);
+
     Bitmap getBitmap();
 
-    /**
-     * @param b
-     */
     void setBitmap(Bitmap b);
 
-    /**
-     * Sets the position of the element that implements GamePiece in the board.
-     *
-     * @param x the column number that the piece is located on the board
-     * @param y    the row number that the piece is located on the board
-     */
-    void setCoordinates(int x, int y);
-
-    /**
-     * Called from a board Tile that needs to access the Emoticon it is housing
-     *
-     * @return the Emoticon situated on that Tile
-     */
-    Emoticon retrieveEmoticon();
-
-    /**
-     * Gives the particular type of the Emoticon (such as 'HAPPY', 'ANGRY', etc)
-     *
-     * @return a String that gives the type of the GamePiece
-     */
-    String showType();
-
+    String getType();
 }
 

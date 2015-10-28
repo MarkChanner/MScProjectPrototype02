@@ -1,6 +1,5 @@
 package com.markchanner.mscprojectprototype02;
 
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -13,18 +12,18 @@ import java.util.LinkedList;
 public interface MatchFinder {
 
     /**
-     * Returns an ArrayList that contains a List/Lists of matching tiles on the board if
+     * Returns an ArrayList that contains a List/Lists of matching emoticons on the board if
      * they are present. If no matches are present, the returned ArrayList will hold
      * an empty List.
      *
      * @param gv the board to be checked for matching columns
-     * @return An ArrayList that holds either a List/Lists of matching columns, or an empty list
-     * if no matching columns are located on the board
+     * @return An ArrayList that holds either a List/Lists of matching columns, or an
+     * empty list if no matching columns are located on the board
      */
-    ArrayList<LinkedList<Tile>> findMatchingColumns(GameView gv);
+    ArrayList<LinkedList<Emoticon>> findMatchingColumns(GameView gv);
 
     /**
-     * Returns an ArrayList that contains a List/Lists of matching tiles on the board if
+     * Returns an ArrayList that contains a List/Lists of matching emoticons on the board if
      * they are present. If no matches are present, the returned ArrayList will hold
      * an empty List.
      *
@@ -32,8 +31,5 @@ public interface MatchFinder {
      * @return An ArrayList that holds either a List/Lists of matching rows, or an empty list
      * if no matching rows are located on the board
      */
-    ArrayList<LinkedList<Tile>> findMatchingRows(GameView gv);
-
-
-
+    ArrayList<LinkedList<Emoticon>> findMatchingRows(GameView gv);
 }

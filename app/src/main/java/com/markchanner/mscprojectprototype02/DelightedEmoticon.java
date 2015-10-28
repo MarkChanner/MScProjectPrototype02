@@ -7,18 +7,11 @@ import android.graphics.Bitmap;
  */
 public class DelightedEmoticon extends AbstractEmoticon {
 
-    public DelightedEmoticon(Bitmap b) {
-        super (b, "DELIGHTED");
-    }
+    public static final String EMOTION_TYPE = "DELIGHTED";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Emoticon retrieveEmoticon() {
-        return (this);
+    public DelightedEmoticon(int x, int y, Bitmap delightedBitmap) {
+        super (x, y, delightedBitmap, EMOTION_TYPE);
     }
-
 }
 
 

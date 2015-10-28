@@ -7,18 +7,11 @@ import android.graphics.Bitmap;
  */
 public class SurprisedEmoticon extends AbstractEmoticon {
 
-    public SurprisedEmoticon(Bitmap b) {
-        super(b, "SURPRISED");
-    }
+    public static final String EMOTION_TYPE = "SURPRISED";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Emoticon retrieveEmoticon() {
-        return (this);
+    public SurprisedEmoticon(int x, int y, Bitmap surprisedBitmap) {
+        super (x, y, surprisedBitmap, EMOTION_TYPE);
     }
-
 }
 
 

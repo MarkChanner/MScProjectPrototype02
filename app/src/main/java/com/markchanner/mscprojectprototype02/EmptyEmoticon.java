@@ -7,18 +7,11 @@ import android.graphics.Bitmap;
  */
 public class EmptyEmoticon extends AbstractEmoticon {
 
-    public EmptyEmoticon(Bitmap b) {
-        super (b, "EMPTY");
-    }
+    public static final String EMOTION_TYPE = "EMPTY";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Emoticon retrieveEmoticon() {
-        return (this);
+    public EmptyEmoticon(int x, int y, Bitmap emptyBitmap) {
+        super (x, y, emptyBitmap, EMOTION_TYPE);
     }
-
 }
 
 

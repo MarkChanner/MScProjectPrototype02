@@ -16,6 +16,7 @@ import java.io.IOException;
 public class GameActivity extends Activity {
 
     private MediaPlayer mediaPlayer;
+    private GameView view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +26,7 @@ public class GameActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         /** removed MatchFinderImpl parameter */
-        GameView view = new GameView(this, new BoardPopulatorImpl());
+        view = new GameView(this, new BoardPopulatorImpl());
         setContentView(view);
 
         mediaPlayer = new MediaPlayer();
@@ -44,6 +45,7 @@ public class GameActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        //view.resume();
         if (mediaPlayer != null) {
             mediaPlayer.start();
         }
@@ -56,6 +58,7 @@ public class GameActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        //view.pause();
         if (mediaPlayer != null) {
             mediaPlayer.pause();
             if (isFinishing()) {

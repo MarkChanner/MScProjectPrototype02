@@ -7,18 +7,11 @@ import android.graphics.Bitmap;
  */
 public class AngryEmoticon extends AbstractEmoticon {
 
-    public AngryEmoticon(Bitmap b) {
-        super (b, "ANGRY");
-    }
+    public static final String EMOTION_TYPE = "ANGRY";
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Emoticon retrieveEmoticon() {
-        return (this);
+    public AngryEmoticon(int x, int y, Bitmap angryBitmap) {
+        super (x, y, angryBitmap, EMOTION_TYPE);
     }
-
 }
 
 

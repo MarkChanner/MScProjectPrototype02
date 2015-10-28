@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 
 
 /**
- * This game piece differs from others in that it takes a constructor which allows
+ * This emoticon differs from others in that it takes a constructor which allows
  * its type to be set. This is used in the BoardPopulatorMock to populate the board
  * with unique values that will not lead to a match and cause difficulties with
  * running tests
@@ -13,13 +13,7 @@ import android.graphics.Bitmap;
  */
 public class MockEmoticon extends AbstractEmoticon {
 
-    public MockEmoticon(Bitmap b, String value) {
-        super(b, value);
+    public MockEmoticon(int x, int y, Bitmap emptyBitmap, String mockType) {
+        super (x, y, emptyBitmap, mockType);
     }
-
-    @Override
-    public Emoticon retrieveEmoticon() {
-        return (this);
-    }
-
 }
