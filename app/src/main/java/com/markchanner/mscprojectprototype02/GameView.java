@@ -1,18 +1,21 @@
 package com.markchanner.mscprojectprototype02;
 
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.view.MotionEvent;
+
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,63 +25,124 @@ import java.util.List;
 /**
  * @author Mark Channer for Birkbeck MSc Computer Science project
  */
-public class GameView extends View { //} extends SurfaceView implements Runnable {
+public class GameView extends SurfaceView implements Runnable {
 
+    Thread gameThread = null;
+    SurfaceHolder holder;
+    volatile boolean running = false;
     private Context context;
-    //private Canvas canvas;
-    private SoundPool soundPool;
-    //private SurfaceHolder holder;
+    private Canvas canvas;
+    private BoardPopulator populator;
+    private MatchFinder matchFinder;
     private Paint backgroundColour;
     private Paint gridLineColour;
     private Paint selectionColor;
-    //volatile boolean playing = false;
-    //Thread gameThread = null;
-
-    int swapID = -1;
     private int emoWidth;
     private int emoHeight;
     private final Rect highlightedEmoticon = new Rect();
-
+    private SoundPool soundPool;
+    int swapID = -1;
     private static final int X_VAL = 0;
     private static final int Y_VAL = 1;
-
-
     private final int X_MAX = 8;
     private final int Y_MAX = 7;
-    private MatchFinder matchFinder;
-    private BoardPopulator populator;
     private Emoticon[][] emoticonArray;
     private int[] selection1 = new int[2];
     private int[] selection2 = new int[2];
     private boolean firstSelectionMade;
 
-    public GameView(Context theContext, BoardPopulator bp) {
-        super(theContext);
-        context = theContext;
-        context.getResources();
+    public GameView(Context context, BoardPopulator populator) {
+        super(context);
+        this.context = context;
+        this.context.getResources();
+        this.populator = populator;
+        this.matchFinder = new MatchFinderImpl();
+        this.soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 
-        // sound file should not exceed 1MB or last over 5 seconds
-        // First parameter defines the max number of sounds effects
-        // can play simultaneously. Final parameter unused to default 0.
-        soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
         try {
-            AssetManager assetManager = context.getAssets();
+            AssetManager assetManager = this.context.getAssets();
             AssetFileDescriptor descriptor = assetManager.openFd("swap.ogg");
             // Second parameter specifies priority of sound effect
             swapID = soundPool.load(descriptor, 0);
         } catch (IOException e) {
-            // print error message
             Log.e("Error", "swapID sound file failed to load!");
         }
 
-        populator = bp;
-        matchFinder = new MatchFinderImpl();
         emoticonArray = new AbstractEmoticon[X_MAX][Y_MAX];
-        //holder = getHolder();
+        holder = getHolder();
         backgroundColour = new Paint();
         gridLineColour = new Paint();
         selectionColor = new Paint();
         resetUserSelections();
+    }
+
+    public void resume() {
+        running = true;
+        gameThread = new Thread(this);
+        gameThread.start(); // starts a new thread, which begins with the below run method
+    }
+
+    @Override
+    public void run() {
+        while (running) {
+            if (!holder.getSurface().isValid())
+                continue;
+            canvas = holder.lockCanvas();
+            draw();
+            holder.unlockCanvasAndPost(canvas);
+        }
+    }
+
+    public void pause() {
+        running = false;
+        while (true) {
+            try {
+                gameThread.join();
+                return;
+            } catch (InterruptedException e) {
+                // retry
+            }
+        }
+    }
+
+    @Override
+    protected void onSizeChanged(int screenWidth, int screenHeight, int oldWidth, int oldHeight) {
+        super.onSizeChanged(screenWidth, screenHeight, oldWidth, oldHeight);
+        emoWidth = screenWidth / X_MAX;
+        emoHeight = screenHeight / Y_MAX;
+        populator.populate(this, context, emoWidth, emoHeight);
+    }
+
+    private void draw() {
+        // Erase the last frame
+        canvas.drawColor(Color.argb(255, 0, 0, 0));
+
+        final int ZERO = 0;
+        backgroundColour.setColor(Color.parseColor("#7EC0EE"));
+
+        // Draws a screen-sized rectangle with sky blue inside
+        canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
+
+        // Highlights a selected emoticon
+        selectionColor.setColor(Color.parseColor("#fff2a8"));
+        canvas.drawRect(highlightedEmoticon, selectionColor);
+
+        gridLineColour.setStrokeWidth(2f);
+        gridLineColour.setColor(Color.BLACK);
+        for (int i = 0; i < X_MAX; i++) {
+            // Draws  horizontal grid lines
+            canvas.drawLine(ZERO, i * emoHeight, getWidth(), i * emoHeight, gridLineColour);
+            //Draw  vertical grid lines
+            canvas.drawLine(i * emoWidth, ZERO, i * emoWidth, getHeight(), gridLineColour);
+        }
+
+        // Draws emoticons
+        for (int x = 0; x < X_MAX; x++) {
+            for (int y = 0; y < Y_MAX; y++) {
+                Emoticon e = emoticonArray[x][y];
+                canvas.drawBitmap(e.getBitmap(), x * emoWidth, y * emoHeight, null);
+            }
+        }
     }
 
     public int getX_MAX() {
@@ -106,81 +170,6 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
     }
 
     @Override
-    protected void onSizeChanged(int screenWidth, int screenHeight, int oldWidth, int oldHeight) {
-        super.onSizeChanged(screenWidth, screenHeight, oldWidth, oldHeight);
-        emoWidth = screenWidth / X_MAX;
-        emoHeight = screenHeight / Y_MAX;
-        populator.populate(this, context, emoWidth, emoHeight);
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-
-        //canvas = holder.lockCanvas();
-        canvas.drawColor(Color.argb(255, 0, 0, 0));
-
-        final int ZERO = 0;
-        backgroundColour.setColor(Color.parseColor("#7EC0EE"));
-        // Draws a screen-sized rectangle with sky blue inside
-        canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
-
-        // Highlights a selected emoticon
-        selectionColor.setColor(Color.parseColor("#fff2a8"));
-        canvas.drawRect(highlightedEmoticon, selectionColor);
-
-        gridLineColour.setStrokeWidth(2f);
-        gridLineColour.setColor(Color.BLACK);
-        for (int i = 0; i < X_MAX; i++) {
-            // Draws  horizontal grid lines
-            canvas.drawLine(ZERO, i * emoHeight, getWidth(), i * emoHeight, gridLineColour);
-            //Draw  vertical grid lines
-            canvas.drawLine(i * emoWidth, ZERO, i * emoWidth, getHeight(), gridLineColour);
-        }
-        // Draws emoticons
-        for (int x = 0; x < X_MAX; x++) {
-            for (int y = 0; y < Y_MAX; y++) {
-                Emoticon e = emoticonArray[x][y];
-                canvas.drawBitmap(e.getBitmap(), x * emoWidth, y * emoHeight, null);
-            }
-        }
-        //holder.unlockCanvasAndPost(canvas);
-
-    }
-
-    /*private void draw() {
-        if (holder.getSurface().isValid()) {
-            canvas = holder.lockCanvas();
-            canvas.drawColor(Color.argb(255, 0, 0, 0));
-
-            final int ZERO = 0;
-            backgroundColour.setColor(Color.parseColor("#7EC0EE"));
-            // Draws a screen-sized rectangle with sky blue inside
-            canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
-
-            // Highlights a selected  emoticon
-            selectionColor.setColor(Color.parseColor("#fff2a8"));
-            canvas.drawRect(highlightedEmoticon, selectionColor);
-
-            gridLineColour.setStrokeWidth(2f);
-            gridLineColour.setColor(Color.BLACK);
-            for (int i = 0; i < X_MAX; i++) {
-                // Draws  horizontal grid lines
-                canvas.drawLine(ZERO, i * emoHeight, getWidth(), i * emoHeight, gridLineColour);
-                //Draw  vertical grid lines
-                canvas.drawLine(i * emoWidth, ZERO, i * emoWidth, getHeight(), gridLineColour);
-            }
-            // Draws emoticons
-            for (int x = 0; x < X_MAX; x++) {
-                for (int y = 0; y < Y_MAX; y++) {
-                    Emoticon e = emoticonArray[x][y].getEmoticon();
-                    canvas.drawBitmap(e.getBitmap(), x * emoWidth, y * emoHeight, null);
-                }
-            }
-            holder.unlockCanvasAndPost(canvas);
-        }
-    }*/
-
-    @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int) event.getX();
         int y = (int) event.getY();
@@ -189,7 +178,6 @@ public class GameView extends View { //} extends SurfaceView implements Runnable
                 selectEmoticon(x / emoWidth, y / emoHeight);
                 break;
         }
-        //invalidate();
         return true;
     }
 
