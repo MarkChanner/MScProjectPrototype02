@@ -136,6 +136,7 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawLine(i * emoWidth, ZERO, i * emoWidth, getHeight(), gridLineColour);
         }
 
+		/** !!! drawBitmap line WILL PROBABLY NEED TO BE CHANGED TO ()e.getX() * emoWidth), etc */
         // Draws emoticons
         for (int x = 0; x < X_MAX; x++) {
             for (int y = 0; y < Y_MAX; y++) {

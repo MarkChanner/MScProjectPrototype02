@@ -21,15 +21,12 @@ public class GameActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Sets to full screen
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        /** removed MatchFinderImpl parameter */
         view = new GameView(this, new BoardPopulatorImpl());
         setContentView(view);
-
         mediaPlayer = new MediaPlayer();
+
         try {
             AssetManager assetManager = getAssets();
             AssetFileDescriptor musicDescriptor = assetManager.openFd("shroom_ridge.ogg");  // Temporary music
@@ -45,10 +42,10 @@ public class GameActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        //view.resume();
         if (mediaPlayer != null) {
             mediaPlayer.start();
         }
+        view.resume();
     }
 
     /**
@@ -58,7 +55,6 @@ public class GameActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        //view.pause();
         if (mediaPlayer != null) {
             mediaPlayer.pause();
             if (isFinishing()) {
@@ -66,5 +62,6 @@ public class GameActivity extends Activity {
                 mediaPlayer.release();
             }
         }
+        view.pause();
     }
 }
