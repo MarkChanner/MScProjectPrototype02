@@ -158,8 +158,10 @@ public abstract class AbstractEmoticon implements Emoticon {
             pixelsToMove /= 2;
         }
         screenPosY += pixelsToMove;
-        if (screenPosY >= destination) shiftDown = false;
-        //setShiftDistance(0); /** This is a problem */
+        if (screenPosY >= destination) {
+            shiftDown = false;
+            setShiftDistance(0);
+        }
     }
 
     public void setShiftDistance(int shiftDistance) {
