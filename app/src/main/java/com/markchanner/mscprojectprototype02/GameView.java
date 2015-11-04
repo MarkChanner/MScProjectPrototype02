@@ -1,79 +1,97 @@
 package com.markchanner.mscprojectprototype02;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
-import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-
+import android.content.Context;
+import android.graphics.Canvas;
+import android.view.SurfaceHolder;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.view.MotionEvent;
-
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.util.Log;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.view.MotionEvent;
 
 import java.io.IOException;
+
+import android.util.Log;
+
+import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
+
 
 /**
  * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public class GameView extends SurfaceView implements Runnable {
 
-    Thread gameThread = null;
-    SurfaceHolder holder;
-    volatile boolean running = false;
-    private Context context;
-    private Canvas canvas;
-    private BoardPopulator populator;
-    private MatchFinder matchFinder;
-    private Paint backgroundColour;
-    private Paint gridLineColour;
-    private Paint selectionColor;
+    //private Context context;
     private int emoWidth;
     private int emoHeight;
-    private final Rect highlightedEmoticon = new Rect();
+    private Emoticon[][] emoticonArray;
+    private BoardPopulator populator;
+    private MatchFinder matchFinder;
     private SoundPool soundPool;
-    int swapID = -1;
-    private static final int X_VAL = 0;
-    private static final int Y_VAL = 1;
+    int swapSoundEffectID = -1;
+    private SurfaceHolder holder;
+    private Thread gameThread = null;
+    volatile boolean running = false;
+    private final Rect highlightSelection = new Rect();
+    private Paint backgroundColour;
+    private Paint gridLineColour;
+    private Paint selectionColour;
     private final int X_MAX = 8;
     private final int Y_MAX = 7;
-    private Emoticon[][] emoticonArray;
+    public static final int X_VAL = 0;
+    public static final int Y_VAL = 1;
+    public static final int ZERO = 0;
+    public static final String EMPTY = "EMPTY";
+    private boolean firstSelectionMade;
     private int[] selection1 = new int[2];
     private int[] selection2 = new int[2];
-    private boolean firstSelectionMade;
 
-    public GameView(Context context, BoardPopulator populator) {
+    public GameView(Context context, int screenX, int screenY, BoardPopulator populator) {
         super(context);
-        this.context = context;
-        this.context.getResources();
+        //this.context = context;
+        context.getResources();
+        this.emoWidth = screenX / X_MAX;
+        this.emoHeight = screenY / Y_MAX;
+        this.emoticonArray = new AbstractEmoticon[X_MAX][Y_MAX];
         this.populator = populator;
+        this.populator.populate(this, context, emoWidth, emoHeight);
         this.matchFinder = new MatchFinderImpl();
         this.soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC, 0);
 
         try {
-            AssetManager assetManager = this.context.getAssets();
+            AssetManager assetManager = context.getAssets();
             AssetFileDescriptor descriptor = assetManager.openFd("swap.ogg");
             // Second parameter specifies priority of sound effect
-            swapID = soundPool.load(descriptor, 0);
+            swapSoundEffectID = soundPool.load(descriptor, 0);
         } catch (IOException e) {
-            Log.e("Error", "swapID sound file failed to load!");
+            Log.e("Error", "swapSoundEffectID sound file failed to load!");
         }
 
-        emoticonArray = new AbstractEmoticon[X_MAX][Y_MAX];
         holder = getHolder();
         backgroundColour = new Paint();
+        backgroundColour.setColor(Color.parseColor("#7EC0EE"));
         gridLineColour = new Paint();
-        selectionColor = new Paint();
+        gridLineColour.setStrokeWidth(2f);
+        gridLineColour.setColor(Color.BLACK);
+        selectionColour = new Paint();
+        selectionColour.setColor(Color.parseColor("#fff2a8"));
         resetUserSelections();
+        draw();
+    }
+
+    private void resetUserSelections() {
+        firstSelectionMade = false;
+        selection1[X_VAL] = -1;
+        selection1[Y_VAL] = -1;
+        selection2[X_VAL] = -1;
+        selection2[Y_VAL] = -1;
     }
 
     public void resume() {
@@ -85,11 +103,65 @@ public class GameView extends SurfaceView implements Runnable {
     @Override
     public void run() {
         while (running) {
-            if (!holder.getSurface().isValid())
-                continue;
-            canvas = holder.lockCanvas();
+            update();
             draw();
+            control();
+        }
+    }
+
+    private void update() {
+        for (int y = Y_MAX - 1; y >= 0; y--) {
+            for (int x = 0; x < X_MAX; x++) {
+                if (emoticonArray[x][y].swapUpActivated()) {
+                    emoticonArray[x][y].swapUp();
+                } else if (emoticonArray[x][y].swapDownActivated()) {
+                    emoticonArray[x][y].swapDown();
+                } else if (emoticonArray[x][y].swapLeftActivated()) {
+                    emoticonArray[x][y].swapLeft();
+                } else if (emoticonArray[x][y].swapRightActivated()) {
+                    emoticonArray[x][y].swapRight();
+                } else if (emoticonArray[x][y].shiftDownActivated()) {
+                    emoticonArray[x][y].shiftDown();
+                }
+            }
+        }
+    }
+
+    private void draw() {
+        Canvas canvas;
+        if (holder.getSurface().isValid()) {
+            canvas = holder.lockCanvas();
+
+            // Erase the last frame
+            canvas.drawColor(Color.argb(255, 0, 0, 0));
+            canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
+
+            // Highlight a selected emoticon
+            canvas.drawRect(highlightSelection, selectionColour);
+
+            for (int i = 0; i < X_MAX; i++) {
+                // Draws horizontal grid lines
+                canvas.drawLine(ZERO, i * emoHeight, getWidth(), i * emoHeight, gridLineColour);
+                //Draw vertical grid lines
+                canvas.drawLine(i * emoWidth, ZERO, i * emoWidth, getHeight(), gridLineColour);
+            }
+
+            // Draws emoticons
+            for (int x = 0; x < X_MAX; x++) {
+                for (int y = 0; y < Y_MAX; y++) {
+                    Emoticon e = emoticonArray[x][y];
+                    canvas.drawBitmap(e.getBitmap(), e.getScreenXPosition(), e.getScreenYPosition(), null);
+                }
+            }
             holder.unlockCanvasAndPost(canvas);
+        }
+    }
+
+    private void control() {
+        try {
+            Thread.sleep(16);
+        } catch (InterruptedException e) {
+
         }
     }
 
@@ -101,47 +173,6 @@ public class GameView extends SurfaceView implements Runnable {
                 return;
             } catch (InterruptedException e) {
                 // retry
-            }
-        }
-    }
-
-    @Override
-    protected void onSizeChanged(int screenWidth, int screenHeight, int oldWidth, int oldHeight) {
-        super.onSizeChanged(screenWidth, screenHeight, oldWidth, oldHeight);
-        emoWidth = screenWidth / X_MAX;
-        emoHeight = screenHeight / Y_MAX;
-        populator.populate(this, context, emoWidth, emoHeight);
-    }
-
-    private void draw() {
-        // Erase the last frame
-        canvas.drawColor(Color.argb(255, 0, 0, 0));
-
-        final int ZERO = 0;
-        backgroundColour.setColor(Color.parseColor("#7EC0EE"));
-
-        // Draws a screen-sized rectangle with sky blue inside
-        canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
-
-        // Highlights a selected emoticon
-        selectionColor.setColor(Color.parseColor("#fff2a8"));
-        canvas.drawRect(highlightedEmoticon, selectionColor);
-
-        gridLineColour.setStrokeWidth(2f);
-        gridLineColour.setColor(Color.BLACK);
-        for (int i = 0; i < X_MAX; i++) {
-            // Draws  horizontal grid lines
-            canvas.drawLine(ZERO, i * emoHeight, getWidth(), i * emoHeight, gridLineColour);
-            //Draw  vertical grid lines
-            canvas.drawLine(i * emoWidth, ZERO, i * emoWidth, getHeight(), gridLineColour);
-        }
-
-		/** !!! drawBitmap line WILL PROBABLY NEED TO BE CHANGED TO ()e.getX() * emoWidth), etc */
-        // Draws emoticons
-        for (int x = 0; x < X_MAX; x++) {
-            for (int y = 0; y < Y_MAX; y++) {
-                Emoticon e = emoticonArray[x][y];
-                canvas.drawBitmap(e.getBitmap(), x * emoWidth, y * emoHeight, null);
             }
         }
     }
@@ -162,14 +193,6 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-    private void resetUserSelections() {
-        firstSelectionMade = false;
-        selection1[X_VAL] = -1;
-        selection1[Y_VAL] = -1;
-        selection2[X_VAL] = -1;
-        selection2[Y_VAL] = -1;
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int) event.getX();
@@ -186,7 +209,7 @@ public class GameView extends SurfaceView implements Runnable {
         if (!(firstSelectionMade)) {
             selection1[X_VAL] = x;
             selection1[Y_VAL] = y;
-            highlightEmoticon(selection1[0], selection1[1]);
+            highlightEmoticon(selection1[X_VAL], selection1[Y_VAL]);
             firstSelectionMade = true;
         } else {
             selection2[X_VAL] = x;
@@ -196,7 +219,7 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void checkValidSelections() {
-        deselectEmoticon();
+        unHighlightEmoticon();
         if (!sameSquareSelectedTwice()) {
             if (selectedEmoticonsAreAdjacent()) {
                 swapPieces();
@@ -215,15 +238,11 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void highlightEmoticon(int x, int y) {
-        invalidate(highlightedEmoticon);
-        highlightedEmoticon.set(x * emoWidth, y * emoHeight, x * emoWidth + emoWidth, y * emoHeight + emoHeight);
-        invalidate(highlightedEmoticon);
+        highlightSelection.set(x * emoWidth, y * emoHeight, x * emoWidth + emoWidth, y * emoHeight + emoHeight);
     }
 
-    private void deselectEmoticon() {
-        invalidate(highlightedEmoticon);
-        highlightedEmoticon.setEmpty();
-        invalidate(highlightedEmoticon);
+    private void unHighlightEmoticon() {
+        highlightSelection.setEmpty();
     }
 
     private boolean sameSquareSelectedTwice() {
@@ -242,7 +261,9 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void swapPieces() {
-        soundPool.play(swapID, 1, 1, 0, 0, 1);
+        soundPool.play(swapSoundEffectID, 1, 1, 0, 0, 1);
+        animateSwap();
+
         Emoticon tempEmoticon1 = emoticonArray[selection1[X_VAL]][selection1[Y_VAL]];
         int tempX = tempEmoticon1.getX();
         int tempY = tempEmoticon1.getY();
@@ -254,6 +275,41 @@ public class GameView extends SurfaceView implements Runnable {
         emoticonArray[selection2[X_VAL]][selection2[Y_VAL]].setX(tempX);
         emoticonArray[selection2[X_VAL]][selection2[Y_VAL]].setY(tempY);
         emoticonArray[selection2[X_VAL]][selection2[Y_VAL]] = tempEmoticon1;
+    }
+
+    private void animateSwap() {
+        Emoticon e1 = emoticonArray[selection1[X_VAL]][selection1[Y_VAL]];
+        Emoticon e2 = emoticonArray[selection2[X_VAL]][selection2[Y_VAL]];
+
+        if (e1.getX() == e2.getX()) {
+            if (e1.getY() < e2.getY()) {
+                e1.setSwapDown(true);
+                e2.setSwapUp(true);
+                while (e1.swapDownActivated() && e2.swapUpActivated()) {
+                    // wait
+                }
+            } else if (e1.getY() > e2.getY()) {
+                e1.setSwapUp(true);
+                e2.setSwapDown(true);
+                while (e1.swapUpActivated() && e2.swapDownActivated()) {
+                    // wait
+                }
+            }
+        } else if (e1.getY() == e2.getY()) {
+            if (e1.getX() < e2.getX()) {
+                e1.setSwapRight(true);
+                e2.setSwapLeft(true);
+                while (e1.swapRightActivated() && e2.swapLeftActivated()) {
+                    // wait
+                }
+            } else if (e1.getX() > e2.getX()) {
+                e1.setSwapLeft(true);
+                e2.setSwapRight(true);
+                while (e1.swapLeftActivated() && e2.swapRightActivated()) {
+                    // wait
+                }
+            }
+        }
     }
 
     private void findMatches() {
@@ -290,39 +346,58 @@ public class GameView extends SurfaceView implements Runnable {
             for (Emoticon t : removeList) {
                 int x = t.getX();
                 int y = t.getY();
-                if (!(emoticonArray[x][y].getType().equals("EMPTY"))) {
+                if (!(emoticonArray[x][y].getType().equals(EMPTY))) {
                     Bitmap emptyBitmap = populator.getEmptyBitmap();
-                    emoticonArray[x][y] = new EmptyEmoticon(x, y, emptyBitmap);
+                    emoticonArray[x][y] = new EmptyEmoticon(x, y, emoWidth, emoHeight, emptyBitmap);
                 }
             }
         }
     }
 
     private void shiftIconsDown() {
+        int rowToShift;
+        Bitmap emptyBitmap = populator.getEmptyBitmap();
         for (int x = 0; x < X_MAX; x++) {
             for (int y = Y_MAX - 1; y >= 0; y--) {
-                // If empty emoticon found, mark emoticon and proceed up column until
-                // gets to end of column or finds a non-empty emoticon, in which
-                // case this non-empty emoticon should be moved to the previously
-                // marked emoticon and then set to empty
-                if (emoticonArray[x][y].getType().equals("EMPTY")) {
-                    int tempY = y;
-                    while ((tempY >= 0) && (emoticonArray[x][tempY].getType().equals("EMPTY"))) {
-                        tempY--;
+                rowToShift = 1;
+                if (emoticonArray[x][y].getType().equals(EMPTY)) {
+                    while ((y - rowToShift >= 0) && (emoticonArray[x][y - rowToShift].getType().equals(EMPTY))) {
+                        rowToShift++;
                     }
-
-                    // If all emoticonArray to the top of the column are empty, then
-                    // the value of tempY will be not be less than 0,
-                    // which means there are no icons in the column to shift down
-                    if (tempY >= 0) {
-                        Emoticon shiftedEmoticon = emoticonArray[x][tempY];
-                        shiftedEmoticon.setX(emoticonArray[x][y].getX());
-                        shiftedEmoticon.setY(emoticonArray[x][y].getY());
-                        emoticonArray[x][y] = shiftedEmoticon;
-                        Bitmap emptyBitmap = populator.getEmptyBitmap();
-                        emoticonArray[x][tempY] = new EmptyEmoticon(x, tempY, emptyBitmap);
+                    // we now have the appropriate gap for this column to move everything down by
+                    while (y >= 0) {
+                        if (y - rowToShift >= 0) {
+                            emoticonArray[x][y] = emoticonArray[x][y - rowToShift];
+                            emoticonArray[x][y].setShiftDistance(rowToShift);
+                            emoticonArray[x][y].setShiftDown(true); /** trying this */
+                        } else {
+                            emoticonArray[x][y] = new EmptyEmoticon(x, y, emoWidth, emoHeight, emptyBitmap);
+                        }
+                        y--;
                     }
                 }
+            }
+        }
+
+        boolean waiting = true;
+        while (waiting) {
+            waiting = false;
+            for (int x = 0; x < X_MAX; x++) {
+                for (int y = Y_MAX - 1; y >= 0; y--) {
+                    if (emoticonArray[x][y].shiftDownActivated()) {
+                        waiting = true;
+                    }
+                }
+            }
+        }
+        updateEmoticonArray();
+    }
+
+    private void updateEmoticonArray() {
+        for (int x = 0; x < X_MAX; x++) {
+            for (int y = 0; y < Y_MAX; y++) {
+                emoticonArray[x][y].setX(x);
+                emoticonArray[x][y].setY(y);
             }
         }
     }
@@ -330,8 +405,8 @@ public class GameView extends SurfaceView implements Runnable {
     private void insertNewEmoticons() {
         for (int x = 0; x < X_MAX; x++) {
             for (int y = 0; y < Y_MAX; y++) {
-                if (emoticonArray[x][y].getType().equals("EMPTY")) {
-                    Emoticon newEmoticon = populator.generateRandomEmoticon(x, y);
+                if (emoticonArray[x][y].getType().equals(EMPTY)) {
+                    Emoticon newEmoticon = populator.generateRandomEmoticon(x, y, emoWidth, emoHeight);
                     emoticonArray[x][y] = newEmoticon;
                 }
             }

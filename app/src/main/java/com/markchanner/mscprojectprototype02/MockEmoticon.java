@@ -13,7 +13,7 @@ import android.graphics.Bitmap;
  */
 public class MockEmoticon extends AbstractEmoticon {
 
-    public MockEmoticon(int x, int y, Bitmap emptyBitmap, String mockType) {
-        super (x, y, emptyBitmap, mockType);
+    public MockEmoticon(int x, int y, int emoWidth, int emoHeight, Bitmap emptyBitmap, String mockType) {
+        super(x, y, emoWidth, emoHeight, emptyBitmap, mockType);
     }
 }

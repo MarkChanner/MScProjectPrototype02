@@ -9,8 +9,8 @@ public class AngryEmoticon extends AbstractEmoticon {
 
     public static final String EMOTION_TYPE = "ANGRY";
 
-    public AngryEmoticon(int x, int y, Bitmap angryBitmap) {
-        super (x, y, angryBitmap, EMOTION_TYPE);
+    public AngryEmoticon(int x, int y, int emoWidth, int emoHeight, Bitmap angryBitmap) {
+        super (x, y, emoWidth, emoHeight, angryBitmap, EMOTION_TYPE);
     }
 }
 

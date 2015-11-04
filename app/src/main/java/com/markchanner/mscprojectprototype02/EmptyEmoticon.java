@@ -9,8 +9,8 @@ public class EmptyEmoticon extends AbstractEmoticon {
 
     public static final String EMOTION_TYPE = "EMPTY";
 
-    public EmptyEmoticon(int x, int y, Bitmap emptyBitmap) {
-        super (x, y, emptyBitmap, EMOTION_TYPE);
+    public EmptyEmoticon(int x, int y, int emoWidth, int emoHeight, Bitmap emptyBitmap) {
+        super (x, y, emoWidth, emoHeight, emptyBitmap, EMOTION_TYPE);
     }
 }
 

@@ -17,17 +17,16 @@ public interface BoardPopulator {
      *
      * @param view element to be populated with emoticons
      */
-    void populate(GameView view, Context context, int emoticonWidth, int emoticonHeight);
+    void populate(GameView view, Context context, int emoWidth, int emoHeight);
 
     /**
      * Creates a random emoticon
      *
      * @return an emoticon
      */
-    Emoticon generateRandomEmoticon(int x, int y);
+    Emoticon generateRandomEmoticon(int x, int y, int emoWidth, int emoHeight);
 
-    void createBitmaps(Context context, int emoticonWidth, int emoticonHeight);
-
+    void createBitmaps(Context context, int emoWidth, int emoHeight);
 
     Bitmap getEmptyBitmap();
 

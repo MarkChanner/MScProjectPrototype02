@@ -29,8 +29,8 @@ public class BoardPopulatorImpl implements BoardPopulator {
      * found { @inheritDocs }
      */
     @Override
-    public void populate(GameView view, Context context, int emoticonWidth, int emoticonHeight) {
-        createBitmaps(context, emoticonWidth, emoticonHeight);
+    public void populate(GameView view, Context context, int emoWidth, int emoHeight) {
+        createBitmaps(context, emoWidth, emoHeight);
         int maxX = view.getX_MAX();
         int maxY = view.getY_MAX();
         Emoticon[][] emoticonArray = view.getEmoticonArray();
@@ -38,7 +38,7 @@ public class BoardPopulatorImpl implements BoardPopulator {
         for (int x = 0; x < maxX; x++) {
             for (int y = 0; y < maxY; y++) {
                 do {
-                    newEmoticon = generateRandomEmoticon(x, y);
+                    newEmoticon = generateRandomEmoticon(x, y, emoWidth, emoHeight);
                 } while ((y >= 2 &&
                         (newEmoticon.getType().equals(emoticonArray[x][y - 1].getType()) &&
                                 newEmoticon.getType().equals(emoticonArray[x][y - 2].getType()))) ||
@@ -57,25 +57,25 @@ public class BoardPopulatorImpl implements BoardPopulator {
      * @return a subclass of AbstractEmoticon (AbstractEmoticon implements Emoticon interface)
      */
     @Override
-    public Emoticon generateRandomEmoticon(int x, int y) {
+    public Emoticon generateRandomEmoticon(int x, int y, int emoWidth, int emoHeight) {
         Emoticon emoticon = null;
         Random random = new Random();
         int value = random.nextInt(5);
         switch (value) {
             case 0:
-                emoticon = new AngryEmoticon(x, y, angryBitmap);
+                emoticon = new AngryEmoticon(x, y, emoWidth, emoHeight, angryBitmap);
                 break;
             case 1:
-                emoticon = new DelightedEmoticon(x, y, delightedBitmap);
+                emoticon = new DelightedEmoticon(x, y, emoWidth, emoHeight, delightedBitmap);
                 break;
             case 2:
-                emoticon = new EmbarrassedEmoticon(x, y, embarrassedBitmap);
+                emoticon = new EmbarrassedEmoticon(x, y, emoWidth, emoHeight, embarrassedBitmap);
                 break;
             case 3:
-                emoticon = new SurprisedEmoticon(x, y, surprisedBitmap);
+                emoticon = new SurprisedEmoticon(x, y, emoWidth, emoHeight, surprisedBitmap);
                 break;
             case 4:
-                emoticon = new UpsetEmoticon(x, y, upsetBitmap);
+                emoticon = new UpsetEmoticon(x, y, emoWidth, emoHeight, upsetBitmap);
                 break;
             default:
                 break;
@@ -84,28 +84,28 @@ public class BoardPopulatorImpl implements BoardPopulator {
     }
 
     @Override
-    public void createBitmaps(Context context, int emoticonWidth, int emoticonHeight) {
+    public void createBitmaps(Context context, int emoWidth, int emoHeight) {
 
         Bitmap temp;
         // Retrieves graphics from drawable, scales down, then assigns to Bitmap object
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.empty_tile);
-        emptyBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
+        emptyBitmap = Bitmap.createScaledBitmap(temp, emoWidth, emoHeight, false);
         emptyBitmap.eraseColor(android.graphics.Color.TRANSPARENT);
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.angry);
-        angryBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
+        angryBitmap = Bitmap.createScaledBitmap(temp, emoWidth, emoHeight, false);
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.delighted);
-        delightedBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
+        delightedBitmap = Bitmap.createScaledBitmap(temp, emoWidth, emoHeight, false);
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.embarrassed);
-        embarrassedBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
+        embarrassedBitmap = Bitmap.createScaledBitmap(temp, emoWidth, emoHeight, false);
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.surprised);
-        surprisedBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
+        surprisedBitmap = Bitmap.createScaledBitmap(temp, emoWidth, emoHeight, false);
 
         temp = BitmapFactory.decodeResource(context.getResources(), R.drawable.upset);
-        upsetBitmap = Bitmap.createScaledBitmap(temp, emoticonWidth, emoticonHeight, false);
+        upsetBitmap = Bitmap.createScaledBitmap(temp, emoWidth, emoHeight, false);
     }
 
     @Override

@@ -3,8 +3,10 @@ package com.markchanner.mscprojectprototype02;
 import android.app.Activity;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
+import android.graphics.Point;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -23,8 +25,11 @@ public class GameActivity extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        view = new GameView(this, new BoardPopulatorImpl());
-        setContentView(view);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        // Load the resolution into a Point object
+        Point size = new Point();
+        display.getSize(size);
         mediaPlayer = new MediaPlayer();
 
         try {
@@ -37,6 +42,9 @@ public class GameActivity extends Activity {
         } catch (IOException e) {
             mediaPlayer = null;
         }
+
+        view = new GameView(this, size.x, size.y, new BoardPopulatorImpl());
+        setContentView(view);
     }
 
     @Override

@@ -9,8 +9,8 @@ public class UpsetEmoticon extends AbstractEmoticon {
 
     public static final String EMOTION_TYPE = "UPSET";
 
-    public UpsetEmoticon(int x, int y, Bitmap upsetBitmap) {
-        super (x, y, upsetBitmap, EMOTION_TYPE);
+    public UpsetEmoticon(int x, int y, int emoWidth, int emoHeight, Bitmap upsetBitmap) {
+        super (x, y, emoWidth, emoHeight, upsetBitmap, EMOTION_TYPE);
     }
 }
 
