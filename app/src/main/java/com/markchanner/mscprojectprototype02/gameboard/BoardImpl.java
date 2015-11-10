@@ -1,6 +1,10 @@
-package com.markchanner.mscprojectprototype02;
+package com.markchanner.mscprojectprototype02.gameboard;
+
 
 import android.content.Context;
+
+import com.markchanner.mscprojectprototype02.gamepieces.AbstractEmoticon;
+import com.markchanner.mscprojectprototype02.gamepieces.Emoticon;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

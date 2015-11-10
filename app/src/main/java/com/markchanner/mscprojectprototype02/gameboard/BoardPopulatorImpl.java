@@ -1,8 +1,12 @@
-package com.markchanner.mscprojectprototype02;
+package com.markchanner.mscprojectprototype02.gameboard;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
+import com.markchanner.mscprojectprototype02.R;
+import com.markchanner.mscprojectprototype02.gamepieces.*;
+
 
 import java.util.Random;
 

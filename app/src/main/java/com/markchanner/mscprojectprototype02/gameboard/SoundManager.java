@@ -1,4 +1,4 @@
-package com.markchanner.mscprojectprototype02;
+package com.markchanner.mscprojectprototype02.gameboard;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
