@@ -7,23 +7,17 @@ import android.graphics.Bitmap;
  */
 public interface Emoticon {
 
-    int getX();
+    void update();
 
-    void setX(int x);
+    void setIsPartOfMatch(boolean bool);
 
-    int getY();
+    boolean isPartOfMatch();
 
-    void setY(int y);
+    void setLowerEmoticon(boolean bool);
 
-    int getScreenXPosition();
+    boolean lowerEmoticonActivated();
 
-    int getScreenYPosition();
-
-    Bitmap getBitmap();
-
-    void setBitmap(Bitmap b);
-
-    String getType();
+    void lowerEmoticon();
 
     void setSwapUp(boolean swapUp);
 
@@ -49,13 +43,23 @@ public interface Emoticon {
 
     void swapLeft();
 
-    void setShiftDown(boolean shiftDown);
+    int getArrayX();
 
-    boolean shiftDownActivated();
+    void setArrayX(int x);
 
-    void shiftDown();
+    int getArrayY();
 
-    void setShiftDistance(int shiftDistance);
+    void setArrayY(int y);
+
+    int getScreenPositionX();
+
+    int getScreenPositionY();
+
+    void setScreenPositionY(int screenPositionY);
+
+    Bitmap getBitmap();
+
+    String getType();
 
 }
 

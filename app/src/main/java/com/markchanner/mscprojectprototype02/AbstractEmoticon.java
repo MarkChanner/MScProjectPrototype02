@@ -7,164 +7,213 @@ import android.graphics.Bitmap;
  */
 public abstract class AbstractEmoticon implements Emoticon {
 
-    private int x;
-    private int y;
+    public static final int DIVISOR = 2;
+
+    private int arrayX;
+    private int arrayY;
     private int emoWidth;
     private int emoHeight;
-    private int screenPosX;
-    private int screenPosY;
     private Bitmap bitmap;
-    private String emotionType;
+    private String emoticonType;
+
+    private int screenPositionX;
+    private int screenPositionY;
+    private int pixelMovement; // consider making this a constructor argument
+    volatile boolean lowerEmoticon;
     volatile boolean swapUp;
     volatile boolean swapDown;
-    volatile boolean swapRight = false;
-    volatile boolean swapLeft = false;
-    volatile boolean shiftDown = false;
-    private int shiftDistance = 0;
+    volatile boolean swapRight;
+    volatile boolean swapLeft;
+    volatile boolean isPartOfMatch;
 
-    public AbstractEmoticon(int gridX, int gridY, int emoWidth, int emoHeight, Bitmap bitmap, String emotionType) {
-        this.x = gridX;
-        this.y = gridY;
+    public AbstractEmoticon(int arrayX, int arrayY, int emoWidth, int emoHeight, Bitmap bitmap, String emoticonType, int offScreenStartPositionY) {
+        this.arrayX = arrayX;
+        this.arrayY = arrayY;
         this.emoWidth = emoWidth;
         this.emoHeight = emoHeight;
-        this.screenPosX = emoWidth * x;
-        this.screenPosY = emoHeight * y;
         this.bitmap = bitmap;
-        this.emotionType = emotionType;
+        this.emoticonType = emoticonType;
+
+        this.pixelMovement = 32;
+        this.screenPositionX = (arrayX * emoWidth);
+        this.screenPositionY = (offScreenStartPositionY * emoHeight);
+        this.lowerEmoticon = true;
     }
 
-    public int getX() {
-        return x;
+    @Override
+    public void update() {
+        if (lowerEmoticonActivated()) {
+            lowerEmoticon();
+        } else if (swapUpActivated()) {
+            swapUp();
+        } else if (swapDownActivated()) {
+            swapDown();
+        } else if (swapRightActivated()) {
+            swapRight();
+        } else if (swapLeftActivated()) {
+            swapLeft();
+        }
     }
 
-    public void setX(int x) {
-        this.x = x;
-        this.screenPosX = emoWidth * x;
+    @Override
+    public void setIsPartOfMatch(boolean bool) {
+        isPartOfMatch = true;
     }
 
-    public int getY() {
-        return y;
+    @Override
+    public boolean isPartOfMatch() {
+        return isPartOfMatch;
     }
 
-    public void setY(int y) {
-        this.y = y;
-        this.screenPosY = emoHeight * y;
+    @Override
+    public void setLowerEmoticon(boolean bool) {
+        lowerEmoticon = bool;
     }
 
-    public int getScreenXPosition() {
-        return screenPosX;
+    @Override
+    public boolean lowerEmoticonActivated() {
+        return lowerEmoticon;
     }
 
-    public int getScreenYPosition() {
-        return screenPosY;
+    @Override
+    public void lowerEmoticon() {
+        int newPosition = (arrayY * emoHeight);
+        int pixelRate = pixelMovement;
+        while (screenPositionY + pixelRate > newPosition) {
+            pixelRate /= DIVISOR;
+        }
+        screenPositionY += pixelRate;
+        if (screenPositionY >= newPosition) {
+            lowerEmoticon = false;
+        }
     }
 
-    public Bitmap getBitmap() {
-        return bitmap;
-    }
-
-    public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
-    }
-
-    public String getType() {
-        return emotionType;
-    }
-
+    @Override
     public void setSwapUp(boolean swapUp) {
         this.swapUp = swapUp;
     }
 
+    @Override
     public boolean swapUpActivated() {
         return swapUp;
     }
 
+    @Override
     public void swapUp() {
-        int newPosition = emoHeight * (y - 1);
-        int pixelsToMove = 64;
-        while (screenPosY - pixelsToMove < newPosition) {
-            pixelsToMove /= 2;
+        int newPosition = emoHeight * arrayY;
+        int pixelRate = pixelMovement;
+        while (screenPositionY - pixelRate < newPosition) {
+            pixelRate /= DIVISOR;
         }
-        screenPosY -= pixelsToMove;
-        if (screenPosY <= newPosition) swapUp = false;
+        screenPositionY -= pixelRate;
+        if (screenPositionY <= newPosition) swapUp = false;
     }
 
+    @Override
     public void setSwapDown(boolean swapDown) {
         this.swapDown = swapDown;
     }
 
+    @Override
     public boolean swapDownActivated() {
         return swapDown;
     }
 
+    @Override
     public void swapDown() {
-        int destination = emoHeight * (y + 1);
-        int pixelsToMove = 64;
-        while (screenPosY + pixelsToMove > destination) {
-            pixelsToMove /= 2;
+        int newPosition = emoHeight * arrayY;
+        int pixelRate = pixelMovement;
+        while (screenPositionY + pixelRate > newPosition) {
+            pixelRate /= DIVISOR;
         }
-        screenPosY += pixelsToMove;
-        if (screenPosY >= destination) swapDown = false;
+        screenPositionY += pixelRate;
+        if (screenPositionY >= newPosition) swapDown = false;
     }
 
+    @Override
     public void setSwapRight(boolean swapRight) {
         this.swapRight = swapRight;
     }
 
+    @Override
     public boolean swapRightActivated() {
         return swapRight;
     }
 
+    @Override
     public void swapRight() {
-        int destination = emoWidth * (x + 1);
-        int pixelsToMove = 64;
-        while (screenPosX + pixelsToMove > destination) {
-            pixelsToMove /= 2;
+        int newPosition = emoWidth * arrayX;
+        int pixelRate = pixelMovement;
+        while (screenPositionX + pixelRate > newPosition) {
+            pixelRate /= DIVISOR;
         }
-        screenPosX += pixelsToMove;
-        if (screenPosX >= destination) swapRight = false;
+        screenPositionX += pixelRate;
+        if (screenPositionX >= newPosition) swapRight = false;
     }
 
+    @Override
     public void setSwapLeft(boolean swapLeft) {
         this.swapLeft = swapLeft;
     }
 
+    @Override
     public boolean swapLeftActivated() {
         return swapLeft;
     }
 
+    @Override
     public void swapLeft() {
-        int destination = emoWidth * (x - 1);
-        int pixelsToMove = 64;
-        while (screenPosX - pixelsToMove < destination) {
-            pixelsToMove /= 2;
+        int newPosition = emoWidth * arrayX;
+        int pixelRate = pixelMovement;
+        while (screenPositionX - pixelRate < newPosition) {
+            pixelRate /= DIVISOR;
         }
-        screenPosX -= pixelsToMove;
-        if (screenPosX <= destination) swapLeft = false;
+        screenPositionX -= pixelRate;
+        if (screenPositionX <= newPosition) swapLeft = false;
     }
 
-    public void setShiftDown(boolean shiftDown) {
-        this.shiftDown = shiftDown;
+    @Override
+    public int getArrayX() {
+        return arrayX;
     }
 
-    public boolean shiftDownActivated() {
-        return shiftDown;
+    @Override
+    public void setArrayX(int arrayX) {
+        this.arrayX = arrayX;
     }
 
-    public void shiftDown() {
-        int destination = emoHeight * (y + shiftDistance);
-        int pixelsToMove = 16;
-        while (screenPosY + pixelsToMove > destination) {
-            pixelsToMove /= 2;
-        }
-        screenPosY += pixelsToMove;
-        if (screenPosY >= destination) {
-            shiftDown = false;
-            setShiftDistance(0);
-        }
+    @Override
+    public int getArrayY() {
+        return arrayY;
     }
 
-    public void setShiftDistance(int shiftDistance) {
-        this.shiftDistance = shiftDistance;
+    @Override
+    public void setArrayY(int arrayY) {
+        this.arrayY = arrayY;
+    }
+
+    @Override
+    public int getScreenPositionX() {
+        return screenPositionX;
+    }
+
+    @Override
+    public int getScreenPositionY() {
+        return screenPositionY;
+    }
+
+    @Override
+    public void setScreenPositionY(int screenPositionY) {
+        this.screenPositionY = screenPositionY;
+    }
+
+    @Override
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    @Override
+    public String getType() {
+        return emoticonType;
     }
 }
