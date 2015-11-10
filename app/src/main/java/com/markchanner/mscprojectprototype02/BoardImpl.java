@@ -33,13 +33,13 @@ public class BoardImpl implements Board {
 
 
     public BoardImpl(Context context, int emoticonWidth, int emoticonHeight) {
-        this.soundManager = new SoundManager();
-        this.soundManager.loadSound(context);
+        soundManager = new SoundManager();
+        soundManager.loadSound(context);
         this.emoticonWidth = emoticonWidth;
         this.emoticonHeight = emoticonHeight;
-        this.emoticons = new AbstractEmoticon[X_MAX][Y_MAX];
-        this.populator = new BoardPopulatorImpl();
-        this.populator.populateBoard(context, this, emoticonWidth, emoticonHeight);
+        emoticons = new AbstractEmoticon[X_MAX][Y_MAX];
+        populator = new BoardPopulatorImpl();
+        populator.populateBoard(context, this, emoticonWidth, emoticonHeight);
     }
 
     @Override

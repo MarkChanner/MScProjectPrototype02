@@ -41,31 +41,31 @@ public class GameView extends SurfaceView implements Runnable {
         this.context = context;
         this.context.getResources();
 
-        this.emoWidth = screenX / X_MAX;
-        this.emoHeight = screenY / Y_MAX;
+        emoWidth = screenX / X_MAX;
+        emoHeight = screenY / Y_MAX;
 
-        this.holder = getHolder();
-        this.backgroundColour = new Paint();
-        this.backgroundColour.setColor(Color.parseColor("#7EC0EE"));
+        holder = getHolder();
+        backgroundColour = new Paint();
+        backgroundColour.setColor(Color.parseColor("#7EC0EE"));
 
-        this.gridLineColour = new Paint();
-        this.gridLineColour.setStrokeWidth(2f);
-        this.gridLineColour.setColor(Color.BLACK);
+        gridLineColour = new Paint();
+        gridLineColour.setStrokeWidth(2f);
+        gridLineColour.setColor(Color.BLACK);
 
-        this.selectionFill = new Paint();
-        this.selectionFill.setColor(Color.parseColor("#fff2a8"));
+        selectionFill = new Paint();
+        selectionFill.setColor(Color.parseColor("#fff2a8"));
 
-        this.selectionBorder = new Paint();
-        this.selectionBorder.setStyle(Paint.Style.STROKE);
-        this.selectionBorder.setStrokeWidth(2f);
-        this.selectionBorder.setColor(Color.BLACK);
+        selectionBorder = new Paint();
+        selectionBorder.setStyle(Paint.Style.STROKE);
+        selectionBorder.setStrokeWidth(2f);
+        selectionBorder.setColor(Color.BLACK);
 
         startGame();
     }
 
     private void startGame() {
-        this.board = new BoardImpl(context, emoWidth, emoHeight);
-        this.selections = new SelectionImpl();
+        board = new BoardImpl(context, emoWidth, emoHeight);
+        selections = new SelectionImpl();
     }
 
     public void resume() {

@@ -34,10 +34,10 @@ public abstract class AbstractEmoticon implements Emoticon {
         this.bitmap = bitmap;
         this.emoticonType = emoticonType;
 
-        this.pixelMovement = 32;
-        this.screenPositionX = (arrayX * emoWidth);
-        this.screenPositionY = (offScreenStartPositionY * emoHeight);
-        this.lowerEmoticon = true;
+        pixelMovement = 32;
+        screenPositionX = (arrayX * emoWidth);
+        screenPositionY = (offScreenStartPositionY * emoHeight);
+        lowerEmoticon = true;
     }
 
     @Override
