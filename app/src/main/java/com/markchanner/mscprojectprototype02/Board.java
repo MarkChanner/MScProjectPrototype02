@@ -1,7 +1,14 @@
 package com.markchanner.mscprojectprototype02;
 
 /**
- * Created by Mark on 10/11/2015.
+ * @author Mark Channer for Birkbeck MSc Computer Science project
  */
 public interface Board {
+
+    void updateEmoticonMovements();
+
+    void processSelections(GameView view, Selection selections);
+
+    Emoticon[][] getEmoticons();
+
 }

@@ -26,12 +26,12 @@ public class GameActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        Display display = getWindowManager().getDefaultDisplay();
         // Load the resolution into a Point object
+        Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        mediaPlayer = new MediaPlayer();
 
+        mediaPlayer = new MediaPlayer();
         try {
             AssetManager assetManager = getAssets();
             AssetFileDescriptor musicDescriptor = assetManager.openFd("shroom_ridge.ogg");  // Temporary music
@@ -43,7 +43,7 @@ public class GameActivity extends Activity {
             mediaPlayer = null;
         }
 
-        view = new GameView(this, size.x, size.y, new BoardPopulatorImpl());
+        view = new GameView(this, size.x, size.y);
         setContentView(view);
     }
 
@@ -56,10 +56,6 @@ public class GameActivity extends Activity {
         view.resume();
     }
 
-    /**
-     * Consider resources to release here. Also consider instantiating
-     * SoundPool in onCreate()
-     */
     @Override
     protected void onPause() {
         super.onPause();
