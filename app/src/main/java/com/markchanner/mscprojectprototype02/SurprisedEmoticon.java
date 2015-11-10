@@ -9,8 +9,8 @@ public class SurprisedEmoticon extends AbstractEmoticon {
 
     public static final String EMOTION_TYPE = "SURPRISED";
 
-    public SurprisedEmoticon(int x, int y, int emoWidth, int emoHeight, Bitmap surprisedBitmap) {
-        super (x, y, emoWidth, emoHeight, surprisedBitmap, EMOTION_TYPE);
+    public SurprisedEmoticon(int x, int y, int emoWidth, int emoHeight, Bitmap surprisedBitmap, int offScreenStartPositionY) {
+        super(x, y, emoWidth, emoHeight, surprisedBitmap, EMOTION_TYPE, offScreenStartPositionY);
     }
 }
 

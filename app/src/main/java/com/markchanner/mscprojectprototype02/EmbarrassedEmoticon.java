@@ -9,8 +9,8 @@ public class EmbarrassedEmoticon extends AbstractEmoticon {
 
     public static final String EMOTION_TYPE = "EMBARRASSED";
 
-    public EmbarrassedEmoticon(int x, int y, int emoWidth, int emoHeight, Bitmap embarrassedBitmap) {
-        super (x, y, emoWidth, emoHeight, embarrassedBitmap, EMOTION_TYPE);
+    public EmbarrassedEmoticon(int x, int y, int emoWidth, int emoHeight, Bitmap embarrassedBitmap, int offScreenStartPositionY) {
+        super(x, y, emoWidth, emoHeight, embarrassedBitmap, EMOTION_TYPE, offScreenStartPositionY);
     }
 }
 
