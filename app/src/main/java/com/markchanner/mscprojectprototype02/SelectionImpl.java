@@ -1,4 +1,4 @@
-package com.markchanner.mscprojectprototype02.gameboard;
+package com.markchanner.mscprojectprototype02;
 
 public class SelectionImpl implements Selection {
 

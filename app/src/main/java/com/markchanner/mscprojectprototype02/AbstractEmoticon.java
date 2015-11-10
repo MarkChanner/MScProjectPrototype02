@@ -1,4 +1,4 @@
-package com.markchanner.mscprojectprototype02.gamepieces;
+package com.markchanner.mscprojectprototype02;
 
 import android.graphics.Bitmap;
 

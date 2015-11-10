@@ -1,8 +1,6 @@
-package com.markchanner.mscprojectprototype02.gameboard;
+package com.markchanner.mscprojectprototype02;
 
 import android.content.Context;
-
-import com.markchanner.mscprojectprototype02.gamepieces.Emoticon;
 
 /**
  * Implementations of this interface are used to populateBoard the Board with emoticons.

@@ -1,4 +1,4 @@
-package com.markchanner.mscprojectprototype02.gameboard;
+package com.markchanner.mscprojectprototype02;
 
 import android.view.SurfaceView;
 import android.content.Context;
@@ -8,8 +8,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.MotionEvent;
-
-import com.markchanner.mscprojectprototype02.gamepieces.Emoticon;
 
 /**
  * @author Mark Channer for Birkbeck MSc Computer Science project
