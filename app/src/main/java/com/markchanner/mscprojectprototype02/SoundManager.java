@@ -18,9 +18,6 @@ public class SoundManager {
 
     private int invalidMoveID = -1;
     private int matchFoundID = -1;
-    /**
-     * variables to be used once sound files added
-     */
     private int angryID = -1;
     private int delightedID = -1;
     private int embarrassedID = -1;
@@ -39,6 +36,22 @@ public class SoundManager {
 
             descriptor = assetManager.openFd("swap_back.ogg");
             invalidMoveID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("angry.ogg");
+            angryID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("delighted.ogg");
+            delightedID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("embarrassed.ogg");
+            embarrassedID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("surprised.ogg");
+            surprisedID = soundPool.load(descriptor, 0);
+
+            descriptor = assetManager.openFd("upset.ogg");
+            upsetID = soundPool.load(descriptor, 0);
+
         } catch (IOException e) {
             Log.e("Error", "sound file failed to load!");
         }
@@ -54,24 +67,23 @@ public class SoundManager {
                 soundPool.play(matchFoundID, 1, 1, 0, 0, 1);
                 break;
 
-            /** Sound files yet to be made */
-            case "angryID":
+            case "ANGRY":
                 soundPool.play(angryID, 1, 1, 0, 0, 1);
                 break;
 
-            case "delightedID":
+            case "DELIGHTED":
                 soundPool.play(delightedID, 1, 1, 0, 0, 1);
                 break;
 
-            case "embarrassedID":
+            case "EMBARRASSED":
                 soundPool.play(embarrassedID, 1, 1, 0, 0, 1);
                 break;
 
-            case "surprisedID":
+            case "SURPRISED":
                 soundPool.play(surprisedID, 1, 1, 0, 0, 1);
                 break;
 
-            case "upsetID":
+            case "UPSET":
                 soundPool.play(upsetID, 1, 1, 0, 0, 1);
                 break;
         }

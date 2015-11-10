@@ -203,7 +203,13 @@ public class BoardImpl implements Board {
     }
 
     public void giveReward(GameView view, ArrayList<LinkedList<Emoticon>> matchingX, ArrayList<LinkedList<Emoticon>> matchingY) {
-        soundManager.playSound(MATCH_FOUND);
+        if (!(matchingX.isEmpty())) {
+            String matchingTypeX = matchingX.get(0).getFirst().getType();
+            soundManager.playSound(matchingTypeX);
+        } else if (!(matchingY.isEmpty())) {
+            String matchingTypeY = matchingY.get(0).getFirst().getType();
+            soundManager.playSound(matchingTypeY);
+        }
         highlightMatches(matchingX);
         highlightMatches(matchingY);
         view.control(ONE_SECOND);
