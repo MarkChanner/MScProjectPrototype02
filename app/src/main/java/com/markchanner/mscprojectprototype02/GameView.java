@@ -25,7 +25,6 @@ public class GameView extends SurfaceView implements Runnable {
     private Paint backgroundColour;
     private Paint gridLineColour;
     private Paint selectionFill;
-    private Paint selectionBorder;
 
     private Context context;
     private int emoWidth;
@@ -43,8 +42,6 @@ public class GameView extends SurfaceView implements Runnable {
 
         emoWidth = screenX / X_MAX;
         emoHeight = screenY / Y_MAX;
-
-
 
         startGame();
     }
@@ -86,7 +83,7 @@ public class GameView extends SurfaceView implements Runnable {
         Canvas canvas;
         if (holder.getSurface().isValid()) {
             canvas = holder.lockCanvas();
-            // Draw the coloured background
+            // Draw the background
             canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
 
             // Highlight an emoticon if (isPartOfMatch == true)
