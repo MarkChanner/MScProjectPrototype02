@@ -16,12 +16,12 @@ public class GameView extends SurfaceView implements Runnable {
 
     public static final int X_MAX = BoardImpl.X_MAX;
     public static final int Y_MAX = BoardImpl.Y_MAX;
-    public static final int ZERO = 0;
     public static final int ONE_MILLISECOND = 1;
+    public static final int ZERO = 0;
 
     private final Rect highlightSelectionRect = new Rect();
     private final Rect highlightMatchRect = new Rect();
-    private SurfaceHolder holder;
+    private SurfaceHolder surfaceHolder;
     private Paint backgroundColour;
     private Paint gridLineColour;
     private Paint selectionFill;
@@ -32,23 +32,20 @@ public class GameView extends SurfaceView implements Runnable {
     private Board board;
     private Selection selections;
     private Thread gameViewThread = null;
-    volatile boolean running = false;
 
+    volatile boolean running = false;
 
     public GameView(Context context, int screenX, int screenY) {
         super(context);
         this.context = context;
         this.context.getResources();
-
+        surfaceHolder = getHolder();
         emoWidth = screenX / X_MAX;
         emoHeight = screenY / Y_MAX;
-
         startGame();
     }
 
     private void startGame() {
-        holder = getHolder();
-
         backgroundColour = new Paint();
         backgroundColour.setColor(Color.parseColor("#7EC0EE"));
 
@@ -72,49 +69,49 @@ public class GameView extends SurfaceView implements Runnable {
 
     @Override
     public void run() {
+        Canvas canvas;
         while (running) {
-            board.updateEmoticonMovements();
-            draw();
-            control();
+            if (surfaceHolder.getSurface().isValid()) {
+                canvas = surfaceHolder.lockCanvas();
+                synchronized (this) {
+                    board.updateEmoticonMovements();
+                    drawIt(canvas);
+                    control();
+                }
+                surfaceHolder.unlockCanvasAndPost(canvas);
+            }
         }
     }
 
-    private void draw() {
-        Canvas canvas;
-        if (holder.getSurface().isValid()) {
-            canvas = holder.lockCanvas();
-            // Draw the background
-            canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
+    public void drawIt(Canvas canvas) {
+        // Draw the background
+        canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
 
-            // Highlight an emoticon if (isPartOfMatch == true)
-            canvas.drawRect(highlightSelectionRect, selectionFill);
+        // Highlight an emoticon if Emoticon's isPartOfMatch boolean is true
+        canvas.drawRect(highlightSelectionRect, selectionFill);
 
-            for (int i = 0; i < X_MAX; i++) {
-                // Draws horizontal grid lines
-                canvas.drawLine(ZERO, i * emoHeight, getWidth(), i * emoHeight, gridLineColour);
-                //Draw vertical grid lines
-                canvas.drawLine(i * emoWidth, ZERO, i * emoWidth, getHeight(), gridLineColour);
-            }
+        for (int i = 0; i < X_MAX; i++) {
+            // Horizontal grid lines
+            canvas.drawLine(ZERO, i * emoHeight, getWidth(), i * emoHeight, gridLineColour);
+            // Vertical grid lines
+            canvas.drawLine(i * emoWidth, ZERO, i * emoWidth, getHeight(), gridLineColour);
+        }
 
-            // Draws emoticons
-            Emoticon[][] emoticons = board.getEmoticons();
-            for (int y = Y_MAX - 1; y >= 0; y--) {
-                for (int x = 0; x < X_MAX; x++) {
-                    Emoticon e = emoticons[x][y];
+        Emoticon[][] emoticons = board.getEmoticons();
+        for (int y = Y_MAX - 1; y >= 0; y--) {
+            for (int x = 0; x < X_MAX; x++) {
+                Emoticon e = emoticons[x][y];
 
-                    // if isPartOfMatch is true, highlight that emoticon's background
-                    if (e.isPartOfMatch()) {
-                        int emoX = e.getScreenPositionX();
-                        int emoY = e.getScreenPositionY();
-                        highlightMatchRect.set(emoX, emoY, (emoX + emoWidth), (emoY + emoHeight));
-                        canvas.drawRect(highlightMatchRect, selectionFill);
-                        canvas.drawRect(highlightMatchRect, gridLineColour);
-                    }
-
-                    canvas.drawBitmap(e.getBitmap(), e.getScreenPositionX(), e.getScreenPositionY(), null);
+                // if isPartOfMatch is true, highlight that emoticon's background
+                if (e.isPartOfMatch()) {
+                    int emoX = e.getScreenPositionX();
+                    int emoY = e.getScreenPositionY();
+                    highlightMatchRect.set(emoX, emoY, (emoX + emoWidth), (emoY + emoHeight));
+                    canvas.drawRect(highlightMatchRect, selectionFill);
+                    canvas.drawRect(highlightMatchRect, gridLineColour);
                 }
+                canvas.drawBitmap(e.getBitmap(), e.getScreenPositionX(), e.getScreenPositionY(), null);
             }
-            holder.unlockCanvasAndPost(canvas);
         }
     }
 
