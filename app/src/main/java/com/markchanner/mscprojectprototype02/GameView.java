@@ -44,26 +44,25 @@ public class GameView extends SurfaceView implements Runnable {
         emoWidth = screenX / X_MAX;
         emoHeight = screenY / Y_MAX;
 
+
+
+        startGame();
+    }
+
+    private void startGame() {
         holder = getHolder();
+
         backgroundColour = new Paint();
         backgroundColour.setColor(Color.parseColor("#7EC0EE"));
 
         gridLineColour = new Paint();
+        gridLineColour.setStyle(Paint.Style.STROKE);
         gridLineColour.setStrokeWidth(2f);
         gridLineColour.setColor(Color.BLACK);
 
         selectionFill = new Paint();
         selectionFill.setColor(Color.parseColor("#fff2a8"));
 
-        selectionBorder = new Paint();
-        selectionBorder.setStyle(Paint.Style.STROKE);
-        selectionBorder.setStrokeWidth(2f);
-        selectionBorder.setColor(Color.BLACK);
-
-        startGame();
-    }
-
-    private void startGame() {
         board = new BoardImpl(context, emoWidth, emoHeight);
         selections = new SelectionImpl();
     }
@@ -87,8 +86,6 @@ public class GameView extends SurfaceView implements Runnable {
         Canvas canvas;
         if (holder.getSurface().isValid()) {
             canvas = holder.lockCanvas();
-            // Erase the last frame
-            canvas.drawColor(Color.argb(255, 0, 0, 0));
             // Draw the coloured background
             canvas.drawRect(ZERO, ZERO, getWidth(), getHeight(), backgroundColour);
 
@@ -114,7 +111,7 @@ public class GameView extends SurfaceView implements Runnable {
                         int emoY = e.getScreenPositionY();
                         highlightMatchRect.set(emoX, emoY, (emoX + emoWidth), (emoY + emoHeight));
                         canvas.drawRect(highlightMatchRect, selectionFill);
-                        canvas.drawRect(highlightMatchRect, selectionBorder);
+                        canvas.drawRect(highlightMatchRect, gridLineColour);
                     }
 
                     canvas.drawBitmap(e.getBitmap(), e.getScreenPositionX(), e.getScreenPositionY(), null);
