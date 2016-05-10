@@ -15,12 +15,7 @@ the emotion well, it will not help the children to identify the expression on a 
 I still plan to introduce extra functionality in later prototypes, in addition to some basic requirements 
 that are not yet implemented, such as a score board. In order to introduce a wider range of emotions than 
 the five given so far, I would like to implement levels with emoticons of more advanced emotions as the 
-game goes on. I also need to implement a way for the board to reset if there are no possible matches left. 
-
-##Testing
-The game has been tested (i.e played) by myself, different family members and friends for altogether many  
-hours, and this has been very valuable. Of course, I am aware that this is not enough and need to introduce
-automated testing as was in the first prototype.
+game goes on. I also need to implement a way for the board to reset if there are no possible matches left.
 
 
 
